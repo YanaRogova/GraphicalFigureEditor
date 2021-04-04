@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Figure.h"
 
-#define PI 3.14159265 
 
 
 CFigure::CFigure(int nFigureType, int nPenStyle, int nPenWidth, COLORREF crPenColor,
@@ -30,18 +29,15 @@ CFigure::~CFigure()
 
 void CFigure::SetCoordinates(CPoint point)
 {
-	m_vCoordinates[1] = CPoint(m_vCoordinates[0].x, point.y);
-	m_vCoordinates[2] = point;
-	m_vCoordinates[3] = CPoint(point.x, m_vCoordinates[0].y);
 	m_CenterCoordinates.x = (m_vCoordinates[0].x + point.x) / 2;
 	m_CenterCoordinates.y = (m_vCoordinates[0].y + point.y) / 2;
 
-	m_xHalfLength = (((m_vCoordinates[0].x - m_vCoordinates[2].x) > 0) ?
-		(m_vCoordinates[0].x - m_vCoordinates[2].x) : (m_vCoordinates[2].x - m_vCoordinates[0].x)) / 2.0;
-	m_yHalfLength = (((m_vCoordinates[0].y - m_vCoordinates[2].y) > 0) ?
-		(m_vCoordinates[0].y - m_vCoordinates[2].y) : (m_vCoordinates[2].y - m_vCoordinates[0].y)) / 2.0;
+	m_xHalfLength = (((m_vCoordinates[0].x - point.x) > 0) ?
+		(m_vCoordinates[0].x - point.x) : (point.x - m_vCoordinates[0].x)) / 2.0;
+	m_yHalfLength = (((m_vCoordinates[0].y - point.y) > 0) ?
+		(m_vCoordinates[0].y - point.y) : (point.y - m_vCoordinates[0].y)) / 2.0;
 
-	m_bCanDraw = TRUE;
+	//m_bCanDraw = TRUE;
 }
 
 void CFigure::DrawFigure(CDC* pDC)
@@ -163,4 +159,14 @@ void CFigure::SetBrushAndPen()
 		m_Brush.CreateHatchBrush(m_nBrushStyle, m_crBrushColor);
 
 	m_Pen.CreatePen(m_nPenStyle, m_nPenWidth, m_crPenColor);
+}
+
+
+int CFigure::GetNumberVertices()
+{
+	return -1;
+}
+
+void CFigure::SetVertice(int nNumberVertice, CPoint point)
+{
 }

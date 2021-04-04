@@ -3,7 +3,8 @@
 #include <vector>
 #include "Figure.h"
 #include "Rectangle.h"
-//#include "Triangle.h"
+#include "Ellipse.h"
+#include "Triangle.h"
 //class CGraphicalWindow : public CWnd
 //{
 //protected:
@@ -33,6 +34,7 @@ public:
 	afx_msg BOOL CGraphicalWindow::OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	void CGraphicalWindow::SetFigureType(int nFigureType);
+
 protected:
 
 	DECLARE_MESSAGE_MAP()
@@ -49,7 +51,7 @@ public:
 	COLORREF m_crFigureBrushColor;
 	std::vector <CFigure *> m_Figure;
 	bool m_bLButtonUp;
-
+	bool m_bFigureDone;
 protected:
 	std::vector<CPoint> m_pRectCoordinates;
 	bool m_bPaintNow;

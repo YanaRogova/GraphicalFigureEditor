@@ -94,7 +94,7 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	m_GraphicalWindow.Create(L"", WS_VISIBLE | WS_CHILD | WS_TABSTOP | WS_BORDER | SS_NOTIFY,
+	m_GraphicalWindow.Create(L"", WS_VISIBLE | WS_CHILD | WS_TABSTOP | WS_BORDER | SS_NOTIFY /*| WS_VSCROLL | WS_HSCROLL | WS_SIZEBOX*/,
 		CRect(10, 10, 390, 390), this, ID_OUTPUT_WINDOW);
 
 	CString str;
@@ -108,7 +108,7 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_ButEllipse.Create(L"Ellipse", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
 		CRect(400, 70, 500, 100), this, ID_BUT_ELLIPSE);
 
-	m_CBoxPenStyles.Create(WS_VISIBLE | WS_CHILD | WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST,
+	m_CBoxPenStyles.Create(WS_VISIBLE | WS_CHILD | WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST |WS_VSCROLL,
 		CRect(400, 120, 710, 300), this, ID_CBOX_PEN_STYLES);
 	for (int i = 0; i < PenStylesNames.size(); i++)
 	{
@@ -238,7 +238,7 @@ COLORREF CChildView::GetColor()
 
 void CChildView::OnButtonNormalizeFigure()
 {
-	m_GraphicalWindow.m_Figure[0]->Normalize();
+	m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_Figure.size() - 1]->Normalize();
 	m_GraphicalWindow.OnPaint();
 }
 
@@ -258,7 +258,7 @@ void CChildView::OnButtonLeftRotate()
 	CString strEditText;
 	m_EditFigureAngle.GetWindowText(strEditText);
 	if (!m_GraphicalWindow.m_Figure.empty())
-		m_GraphicalWindow.m_Figure[0]->SetAngle(_wtoi(strEditText));
+		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_Figure.size() - 1]->SetAngle(_wtoi(strEditText));
 	m_GraphicalWindow.OnPaint();
 }
 
@@ -267,7 +267,7 @@ void CChildView::OnButtonRightRotate()
 	CString strEditText;
 	m_EditFigureAngle.GetWindowText(strEditText);
 	if (!m_GraphicalWindow.m_Figure.empty())
-		m_GraphicalWindow.m_Figure[0]->SetAngle(-_wtoi(strEditText));
+		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_Figure.size() - 1]->SetAngle(-_wtoi(strEditText));
 	m_GraphicalWindow.OnPaint();
 }
 

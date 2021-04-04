@@ -46,7 +46,7 @@ void CRectangle::Rotate()
 	m_vAngleCoordinates[2] = RotatePoint(m_xHalfLength, m_yHalfLength);
 	m_vAngleCoordinates[3] = RotatePoint(m_xHalfLength, -m_yHalfLength);
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < m_nVertices; i++)
 	{
 		m_vAngleCoordinates[i] = CPoint(m_CenterCoordinates.x - m_vAngleCoordinates[i].x,
 			m_CenterCoordinates.y - m_vAngleCoordinates[i].y);
@@ -55,17 +55,8 @@ void CRectangle::Rotate()
 
 void CRectangle::SetCoordinates(CPoint point)
 {
-	m_vCoordinates[0] = CFigure::m_vCoordinates[0];
-	m_vCoordinates[1] = CPoint(m_vCoordinates[0].x, point.y);
-	m_vCoordinates[2] = point;
-	m_vCoordinates[3] = CPoint(point.x, m_vCoordinates[0].y);
-	m_CenterCoordinates.x = (m_vCoordinates[0].x + point.x) / 2;
-	m_CenterCoordinates.y = (m_vCoordinates[0].y + point.y) / 2;
+	CFigure::SetCoordinates(point);
 
-	m_xHalfLength = (((m_vCoordinates[0].x - m_vCoordinates[2].x) > 0) ?
-		(m_vCoordinates[0].x - m_vCoordinates[2].x) : (m_vCoordinates[2].x - m_vCoordinates[0].x)) / 2.0;
-	m_yHalfLength = (((m_vCoordinates[0].y - m_vCoordinates[2].y) > 0) ?
-		(m_vCoordinates[0].y - m_vCoordinates[2].y) : (m_vCoordinates[2].y - m_vCoordinates[0].y)) / 2.0;
-
+	NewCoordinates(m_xHalfLength, m_yHalfLength);
 	m_bCanDraw = TRUE;
 }

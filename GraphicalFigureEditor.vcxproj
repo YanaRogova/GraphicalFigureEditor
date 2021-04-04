@@ -184,6 +184,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ChildView.h" />
+    <ClInclude Include="Ellipse.h" />
     <ClInclude Include="Figure.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GraphicalFigureEditor.h" />
@@ -198,6 +199,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChildView.cpp" />
+    <ClCompile Include="Ellipse.cpp" />
     <ClCompile Include="Figure.cpp" />
     <ClCompile Include="GraphicalFigureEditor.cpp" />
     <ClCompile Include="GraphicalWindow.cpp" />

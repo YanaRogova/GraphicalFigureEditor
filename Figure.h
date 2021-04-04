@@ -3,6 +3,7 @@
 #include <array>
 #include "NameID.h"
 
+#define PI 3.14159265 
 //
 //
 //class CConnectLine : public CLine
@@ -39,6 +40,8 @@ public:
 	virtual void Rotate();
 	void SetAngle(int nAngle);
 	void SetBrushAndPen();
+	virtual int GetNumberVertices();
+	virtual void SetVertice(int nNumberVertice, CPoint point);
 
 protected:
 	//int m_nVertices;

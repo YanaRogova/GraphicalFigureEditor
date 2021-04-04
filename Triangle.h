@@ -3,26 +3,26 @@
 class CTriangle : public CFigure
 {
 protected:
-	//virtual void NewCoordinates(int xHalfLength, int yHalfLength);
+	virtual void NewCoordinates(int xHalfLength, int yHalfLength);
 public:
 
 	CTriangle(int nPenStyle, int nPenWidth, COLORREF crPenColor,
 		int nBrushStyle, COLORREF crBrushColor, CString strName, unsigned int id);
-	//virtual ~CTriangle();
-	//virtual void SetCoordinates(CPoint point);
-	//virtual void DrawFigure(CDC* pDC);
-	////virtual void Resize(bool bMoreLess);
-	////virtual void Normalize();
-	//virtual void Rotate();
+	virtual ~CTriangle();
+	void SetCoordinates(CPoint point) override;
+	void DrawFigure(CDC* pDC) override;
+	void Resize(bool bMoreLess) override;
+	void Normalize() override;
+	void Rotate() override;
+	int GetNumberVertices() override;
+	void SetVertice(int nNumberVertice, CPoint point) override;
 
 protected:
 	int m_nVertices;
 	//bool m_bCanDraw;
-	int m_nPenStyle;
-	int m_nPenWidth;
-	COLORREF m_crPenColor;
-	int m_nBrushStyle;
-	COLORREF m_crBrushColor;
+	int m_nEnableVertices;
+	double m_dRadius;
+	double m_dAngle[3];
 	//int m_nAngle;
 	//bool bLeftRightRotate;
 public:
