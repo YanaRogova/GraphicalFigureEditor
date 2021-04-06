@@ -43,6 +43,13 @@ public:
 	virtual int GetNumberVertices();
 	virtual void SetVertice(int nNumberVertice, CPoint point);
 
+	CString GetName();
+	CString GetID();
+	CString GetCenter();
+	virtual CString GetCoordinates();
+	CString GetAngle();
+	CString CFigure::GetFigure();
+
 protected:
 	//int m_nVertices;
 	int m_nFigureType;

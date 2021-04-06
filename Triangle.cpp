@@ -3,7 +3,7 @@
 
 CTriangle::CTriangle(int nPenStyle, int nPenWidth, COLORREF crPenColor,
 	int nBrushStyle, COLORREF crBrushColor, CString strName, unsigned int id) :
-	CFigure(FIGURE_RECTANGLE, nPenStyle, nPenWidth, crPenColor, nBrushStyle, crBrushColor, strName, id)
+	CFigure(FIGURE_TRIANGLE, nPenStyle, nPenWidth, crPenColor, nBrushStyle, crBrushColor, strName, id)
 {
 	m_nEnableVertices = 0;
 	m_nVertices = 3;
@@ -148,4 +148,12 @@ void CTriangle::Normalize()
 	m_dAngle[2] = m_dAngle[1] + 2 * PI / 3;
 
 	NewCoordinates(m_xHalfLength, m_yHalfLength);
+}
+
+CString CTriangle::GetCoordinates()
+{
+	CString str;
+	str.Format(L"{(%d, %d), (%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x,
+		m_vCoordinates[1].y, m_vCoordinates[2].x, m_vCoordinates[2].y);
+	return str;
 }

@@ -170,3 +170,50 @@ int CFigure::GetNumberVertices()
 void CFigure::SetVertice(int nNumberVertice, CPoint point)
 {
 }
+
+CString CFigure::GetName()
+{
+	return m_figureNameID.GetName();
+}
+
+CString CFigure::GetID()
+{
+	CString str;
+	str.Format(L"%d", m_figureNameID.GetID());
+	return str;
+}
+
+CString CFigure::GetCenter()
+{
+	CString str;
+	str.Format(L"(%d, %d)", m_CenterCoordinates.x, m_CenterCoordinates.y);
+	return str;
+}
+
+CString CFigure::GetCoordinates()
+{
+	return L"";
+}
+
+CString CFigure::GetAngle()
+{
+	CString str;
+	str.Format(L"%d", m_nAngle);
+	return str;
+}
+
+CString CFigure::GetFigure()
+{
+	switch (m_nFigureType)
+	{
+	case FIGURE_ELLIPSE:
+		return L"Ellipse";
+	case FIGURE_RECTANGLE:
+		return L"Rectangle";
+	case FIGURE_TRIANGLE:
+		return L"Triangle";
+	default:
+		break;
+	}
+	return L"";
+}

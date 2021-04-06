@@ -34,7 +34,7 @@ public:
 	afx_msg BOOL CGraphicalWindow::OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	void CGraphicalWindow::SetFigureType(int nFigureType);
-
+	void CGraphicalWindow::UpdateList();
 protected:
 
 	DECLARE_MESSAGE_MAP()

@@ -14,7 +14,7 @@ public:
 	//virtual void Resize(bool bMoreLess);
 	virtual void Normalize();
 	virtual void Rotate();
-
+	CString GetCoordinates();
 protected:
 	int m_nVertices;
 	//bool m_bCanDraw;

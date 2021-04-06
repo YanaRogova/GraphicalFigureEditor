@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "GraphicalWindow.h"
-
+#include "EditorView.h"
 #define ID_TIMER	2000
 
 
@@ -39,11 +39,13 @@ void CGraphicalWindow::OnPaint()
 	CMemDC memDC(*pDCPaint, this);
 	CDC* pDC = &memDC.GetDC();
 	//CDC* pDC = GetDC();
-	CRect rect(15, 15, 200, 200);
+	
+	CRect rect;
 	GetWindowRect(rect);
 	ScreenToClient(rect);
 	rect.DeflateRect(1, 1, 1, 1);
 	pDC->FillSolidRect(rect, RGB(180, 243, 254));
+
 	//pDC->Ellipse(20,20,300,80);
 	
 	//delete[] pointArray;
@@ -155,6 +157,7 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 				
 			if (!m_Figure.empty())
 				m_Figure[m_Figure.size() - 1]->Move(point);
+			UpdateList();
 			break;
 		}
 			//SetTimer(ID_TIMER, 10000, NULL);
@@ -172,12 +175,14 @@ void CGraphicalWindow::OnLButtonUp(UINT nFlags, CPoint point)
 		case FIGURE_ELLIPSE:
 		case FIGURE_RECTANGLE:
 			m_Figure[m_Figure.size() - 1]->SetCoordinates(point);
+			UpdateList();
 			//m_nFigureType = -1;
 			break;
 		case FIGURE_TRIANGLE:
 			if (m_Figure[m_Figure.size() - 1]->GetNumberVertices() == 3)
 			{
 				m_Figure[m_Figure.size() - 1]->SetCoordinates(point);
+				UpdateList();
 				m_bFigureDone = TRUE;
 			}
 				
@@ -236,4 +241,11 @@ BOOL CGraphicalWindow::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
 	}
 	return 1;
 
+}
+
+void CGraphicalWindow::UpdateList()
+{
+	//CWnd* = GetParent();
+	CEditorView* pView = static_cast<CEditorView*>(GetParent());
+	pView->UpdateListView();
 }

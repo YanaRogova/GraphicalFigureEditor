@@ -60,3 +60,11 @@ void CRectangle::SetCoordinates(CPoint point)
 	NewCoordinates(m_xHalfLength, m_yHalfLength);
 	m_bCanDraw = TRUE;
 }
+
+CString CRectangle::GetCoordinates()
+{
+	CString str;
+	str.Format(L"{(%d, %d), (%d, %d), (%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x, 
+		m_vCoordinates[1].y, m_vCoordinates[2].x, m_vCoordinates[2].y, m_vCoordinates[3].x, m_vCoordinates[3].y);
+	return str;
+}

@@ -3,7 +3,7 @@
 
 CEllipse::CEllipse(int nPenStyle, int nPenWidth, COLORREF crPenColor,
 	int nBrushStyle, COLORREF crBrushColor, CString strName, unsigned int id):
-	CFigure(FIGURE_RECTANGLE, nPenStyle, nPenWidth, crPenColor, nBrushStyle, crBrushColor, strName, id)
+	CFigure(FIGURE_ELLIPSE, nPenStyle, nPenWidth, crPenColor, nBrushStyle, crBrushColor, strName, id)
 {
 	m_nVertices = 7;
 }
@@ -85,4 +85,12 @@ void CEllipse::Normalize()
 	m_xHalfLength = m_yHalfLength * 4 / 3;
 	//CFigure::m_xHalfLength = m_yHalfLength;
 	NewCoordinates(m_xHalfLength, m_yHalfLength);
+}
+
+CString CEllipse::GetCoordinates()
+{
+	CString str;
+	str.Format(L"{(%d, %d), (%d, %d), (%d, %d), (%d, %d)}", m_vCoordinates[1].x, m_vCoordinates[1].y, m_vCoordinates[2].x,
+		m_vCoordinates[2].y, m_vCoordinates[4].x, m_vCoordinates[4].y, m_vCoordinates[5].x, m_vCoordinates[5].y);
+	return str;
 }

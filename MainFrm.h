@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "ChildView.h"
+#include "EditorView.h"
 
 class CMainFrame : public CFrameWnd
 {
@@ -32,7 +32,7 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-	CChildView    m_wndView;
+	CEditorView    m_wndView;
 
 // Generated message map functions
 protected:

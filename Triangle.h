@@ -16,6 +16,7 @@ public:
 	void Rotate() override;
 	int GetNumberVertices() override;
 	void SetVertice(int nNumberVertice, CPoint point) override;
+	CString GetCoordinates();
 
 protected:
 	int m_nVertices;
