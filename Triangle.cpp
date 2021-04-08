@@ -20,10 +20,38 @@ int CTriangle::GetNumberVertices()
 	return m_nEnableVertices;
 }
 
+void CTriangle::SetNumberVertices(int nNumber)
+{
+	m_nEnableVertices = nNumber;
+}
+
 void CTriangle::SetVertice(int nNumberVertice, CPoint point)
 {
-	m_vCoordinates[nNumberVertice] = point;
-	m_nEnableVertices++;
+	switch (nNumberVertice)
+	{
+	case 0:
+		m_vCoordinates[nNumberVertice] = point;
+		m_nEnableVertices++;
+		break;
+	case 1:
+		if (m_vCoordinates[0] != point)
+		{
+			m_vCoordinates[nNumberVertice] = point;
+			m_nEnableVertices++;
+		}
+		break;
+	case 2:
+		if (m_vCoordinates[0] != point && m_vCoordinates[1] != point &&
+			!(m_vCoordinates[0].x == m_vCoordinates[1].x && m_vCoordinates[0].x == point.x) &&
+			!(m_vCoordinates[0].y == m_vCoordinates[1].y && m_vCoordinates[0].y == point.y))
+		{
+			m_vCoordinates[nNumberVertice] = point;
+			m_nEnableVertices++;
+		}
+		break;
+	}
+
+	
 }
 
 
@@ -39,14 +67,39 @@ void CTriangle::SetCoordinates(CPoint point)
 	//y = k(x-x0)+y0, k = delta y / delta x
 	//http://algolist.manual.ru/maths/geom/equation/circle.php
 
+
+	CPoint buffer;
+	if (m_vCoordinates[1].x - m_vCoordinates[0].x == 0)
+	{
+		buffer = m_vCoordinates[1];
+		m_vCoordinates[1] = m_vCoordinates[2];
+		m_vCoordinates[2] = buffer;
+	}
+	else if (m_vCoordinates[2].x - m_vCoordinates[1].x == 0)
+	{
+		buffer = m_vCoordinates[1];
+		m_vCoordinates[1] = m_vCoordinates[0];
+		m_vCoordinates[0] = buffer;
+	}
+
+	if (m_vCoordinates[1].y - m_vCoordinates[0].y == 0)
+	{
+		buffer = m_vCoordinates[2];
+		m_vCoordinates[2] = m_vCoordinates[0];
+		m_vCoordinates[0] = buffer;
+	}
+
 	double k1 = (static_cast<double>(m_vCoordinates[1].y) - m_vCoordinates[0].y) / (m_vCoordinates[1].x - m_vCoordinates[0].x);
 	double k2 = (static_cast<double>(m_vCoordinates[2].y) - m_vCoordinates[1].y) / (m_vCoordinates[2].x - m_vCoordinates[1].x);
+	
 	m_CenterCoordinates.x = (k1 * k2 * (m_vCoordinates[0].y - m_vCoordinates[2].y) +
 		k2 * (m_vCoordinates[0].x + m_vCoordinates[1].x) - k1 * (m_vCoordinates[1].x + m_vCoordinates[2].x)) / (2 * (k2 - k1));
-	m_CenterCoordinates.y = -(m_CenterCoordinates.x - (m_vCoordinates[0].x + m_vCoordinates[1].x) / 2) / k1 +
-		((m_vCoordinates[0].y + m_vCoordinates[1].y) / 2);
+	m_CenterCoordinates.y = -(m_CenterCoordinates.x - (m_vCoordinates[0].x + m_vCoordinates[1].x) / 2.0) / k1 +
+		((m_vCoordinates[0].y + m_vCoordinates[1].y) / 2.0);
 
-	m_dRadius = pow(pow(m_vCoordinates[0].x - m_CenterCoordinates.x, 2) + pow(m_vCoordinates[0].y - m_CenterCoordinates.y, 2), 0.5);
+	m_dRadius = pow(pow((m_vCoordinates[0].x - m_CenterCoordinates.x), 2) + pow((m_vCoordinates[0].y - m_CenterCoordinates.y), 2), 0.5);
+
+
 	for (int i = 0; i < m_nVertices; i++)
 	{
 		int deltaX = m_vCoordinates[i].x - m_CenterCoordinates.x;
@@ -119,8 +172,8 @@ void CTriangle::Rotate()
 		int y = ((m_CenterCoordinates.y - m_vCoordinates[i].y) > 0) ? (m_CenterCoordinates.y - m_vCoordinates[i].y) :
 			(m_vCoordinates[i].y - m_CenterCoordinates.y);
 		m_vAngleCoordinates[i] = RotatePoint(x, y);*/
-		m_vAngleCoordinates[i] = CPoint(m_CenterCoordinates.x + m_vAngleCoordinates[i].x,
-			m_CenterCoordinates.y + m_vAngleCoordinates[i].y);
+		m_vAngleCoordinates[i] = CPoint(m_CenterCoordinates.x - m_vAngleCoordinates[i].x,
+			m_CenterCoordinates.y - m_vAngleCoordinates[i].y);
 	}
 	/*m_vAngleCoordinates[1].x = m_vCoordinates[1].x;
 	m_vAngleCoordinates[1].y = m_vCoordinates[1].y;
@@ -142,6 +195,13 @@ void CTriangle::NewCoordinates(int xHalfLength, int yHalfLength)
 
 void CTriangle::Normalize()
 {
+	double nSize[3];
+
+	nSize[0] = hypot(m_vCoordinates[0].x - m_vCoordinates[1].x, m_vCoordinates[0].y - m_vCoordinates[1].y);
+	nSize[1] = hypot(m_vCoordinates[1].x - m_vCoordinates[2].x, m_vCoordinates[1].y - m_vCoordinates[2].y);
+	nSize[2] = hypot(m_vCoordinates[2].x - m_vCoordinates[0].x, m_vCoordinates[2].y - m_vCoordinates[0].y);
+
+	//m_dRadius = (nSize[0] + nSize[1] + nSize[2]) / 9 * pow(3, 0.5);
 
 	m_dAngle[0] = -PI / 2;
 	m_dAngle[1] = m_dAngle[0] + 2 * PI / 3;
@@ -153,7 +213,11 @@ void CTriangle::Normalize()
 CString CTriangle::GetCoordinates()
 {
 	CString str;
-	str.Format(L"{(%d, %d), (%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x,
-		m_vCoordinates[1].y, m_vCoordinates[2].x, m_vCoordinates[2].y);
+	if (m_nAngle == 0)
+		str.Format(L"{(%d, %d), (%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x,
+			m_vCoordinates[1].y, m_vCoordinates[2].x, m_vCoordinates[2].y);
+	else
+		str.Format(L"{(%d, %d), (%d, %d), (%d, %d)}", m_vAngleCoordinates[0].x, m_vAngleCoordinates[0].y, m_vAngleCoordinates[1].x,
+			m_vAngleCoordinates[1].y, m_vAngleCoordinates[2].x, m_vAngleCoordinates[2].y);
 	return str;
 }

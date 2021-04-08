@@ -26,6 +26,7 @@ CGraphicalWindow::CGraphicalWindow()
 	BrushStyles = { -1, HS_VERTICAL, HS_HORIZONTAL, HS_CROSS, HS_BDIAGONAL, HS_FDIAGONAL, HS_DIAGCROSS };
 	m_nFigureBrushStyles = 0;
 	m_bFigureDone = TRUE;
+	m_nSelectedFigure = -1;
 }
 
 CGraphicalWindow::~CGraphicalWindow()
@@ -130,9 +131,9 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 		switch (m_nFigureType) 
 		{
 		case FIGURE_ELLIPSE:
-			m_Figure[m_Figure.size() - 1]->m_vCoordinates[0] = point;
+			/*m_Figure[m_Figure.size() - 1]->m_vCoordinates[0] = point;
 			m_bFigureDone = TRUE;
-			break;
+			break;*/
 
 		case FIGURE_RECTANGLE:
 			m_Figure[m_Figure.size() - 1]->m_vCoordinates[0] = point;
@@ -141,10 +142,10 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 
 		case FIGURE_TRIANGLE:
 			nNumberVertice = m_Figure[m_Figure.size() - 1]->GetNumberVertices();
+
 			if (nNumberVertice < 3)
 			{
 				m_Figure[m_Figure.size() - 1]->SetVertice(nNumberVertice, point);
-
 			}
 			break;
 
@@ -156,7 +157,7 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 			}
 				
 			if (!m_Figure.empty())
-				m_Figure[m_Figure.size() - 1]->Move(point);
+				m_Figure[m_nSelectedFigure]->Move(point);
 			UpdateList();
 			break;
 		}
@@ -174,18 +175,24 @@ void CGraphicalWindow::OnLButtonUp(UINT nFlags, CPoint point)
 		switch (m_nFigureType) {
 		case FIGURE_ELLIPSE:
 		case FIGURE_RECTANGLE:
-			m_Figure[m_Figure.size() - 1]->SetCoordinates(point);
+			if (point != m_Figure[m_Figure.size() - 1]->m_vCoordinates[0])
+			{
+				m_nSelectedFigure = m_Figure.size() - 1;
+				m_Figure[m_nSelectedFigure]->SetCoordinates(point);
+			}
+			else
+				m_Figure.pop_back();
 			UpdateList();
 			//m_nFigureType = -1;
 			break;
 		case FIGURE_TRIANGLE:
 			if (m_Figure[m_Figure.size() - 1]->GetNumberVertices() == 3)
 			{
-				m_Figure[m_Figure.size() - 1]->SetCoordinates(point);
+				m_nSelectedFigure = m_Figure.size() - 1;
+				m_Figure[m_nSelectedFigure]->SetCoordinates(point);
 				UpdateList();
 				m_bFigureDone = TRUE;
 			}
-				
 			break;
 		}
 		Invalidate();

@@ -22,7 +22,7 @@ protected:
 	//bool bLeftRightRotate;
 public:
 	CPoint m_vCoordinates[4];
-	CPoint m_vDrawCoordinates[7];
+	CPoint m_vExCoordinates[7];
 	CPoint m_vAngleCoordinates[7];
 	//CPoint m_CenterCoordinates;
 	//double m_xHalfLength;

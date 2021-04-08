@@ -59,7 +59,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	cs.cx = nxSize;
 	cs.cy = nySize;
 	
-	cs.style = WS_OVERLAPPED | WS_CAPTION | FWS_ADDTOTITLE
+	cs.style = WS_OVERLAPPED | WS_CAPTION | FWS_ADDTOTITLE | WS_MAXIMIZE
 		 | WS_SYSMENU | WS_OVERLAPPEDWINDOW;
 
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;

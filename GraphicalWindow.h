@@ -52,6 +52,7 @@ public:
 	std::vector <CFigure *> m_Figure;
 	bool m_bLButtonUp;
 	bool m_bFigureDone;
+	int m_nSelectedFigure;
 protected:
 	std::vector<CPoint> m_pRectCoordinates;
 	bool m_bPaintNow;

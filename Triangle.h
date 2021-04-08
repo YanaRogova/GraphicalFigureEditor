@@ -15,6 +15,7 @@ public:
 	void Normalize() override;
 	void Rotate() override;
 	int GetNumberVertices() override;
+	void SetNumberVertices(int nNumber);
 	void SetVertice(int nNumberVertice, CPoint point) override;
 	CString GetCoordinates();
 

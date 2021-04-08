@@ -8,20 +8,29 @@
 #include "GraphicalWindow.h"
 
 // CChildView window
+class CMyListView : public CListView
+{
+public:
+	CMyListView();
+	virtual ~CMyListView();
+	void OnInitialUpdate() override;
+};
+
+
+
 
 class CEditorView : public CWnd
 {
 // Construction
 public:
 	CEditorView();
-
-
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 // Implementation
 public:
 	virtual ~CEditorView();
-	int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void CEditorView::OnSize(UINT nType, int cx, int cy);
 	afx_msg void CEditorView::OnButtonRect();
 	afx_msg void CEditorView::OnButtonEllipse();
 	afx_msg void CEditorView::OnCBoxPenStyles();
@@ -35,10 +44,13 @@ public:
 	afx_msg void CEditorView::OnButtonLeftRotate();
 	afx_msg void CEditorView::OnButtonRightRotate();
 	afx_msg void CEditorView::OnButtonMove();
+	afx_msg void CEditorView::OnButtonDelete();
 	afx_msg void CEditorView::OnButtonTriangle();
+	afx_msg void OnNotify(NMHDR* pNotifyStruct, LRESULT* result);
 	COLORREF CEditorView::GetColor();
 	void UpdateListView();
 	void MoveFigureElement(int nCurrentPosition, int nNewPosition);
+	void CEditorView::OnInitialUpdate();
 	// Generated message map functions
 protected:
 	afx_msg void OnPaint();
@@ -54,14 +66,19 @@ protected:
 	CButton m_ButChouseBrushColor;
 	CButton m_ButNormalizeFigure;
 	CButton m_ButLeftRotate;
-	CButton m_ButRigthRotate;
+	CButton m_ButRightRotate;
 	CButton m_ButMove;
+	CButton m_ButDelete;
 	CButton m_ButTriangle;
 	std::vector<CString> PenStylesNames;
 	std::vector<CString> PenStylesNamesEx;
 	std::vector<CString> BrushStylesNames;
 	CStatic m_DrawingSpace;
 	CListCtrl m_List;
+	CStatic m_wndStaticAngle;
+	//CMyListView m_List;
 	//CListView m;
 };
+
+
 
