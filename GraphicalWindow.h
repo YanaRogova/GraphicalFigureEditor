@@ -1,6 +1,7 @@
 #pragma once
 #include <afxwin.h>
 #include <vector>
+#include <set>
 #include "Figure.h"
 #include "Rectangle.h"
 #include "Ellipse.h"
@@ -35,6 +36,7 @@ public:
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	void CGraphicalWindow::SetFigureType(int nFigureType);
 	void CGraphicalWindow::UpdateList();
+	void CGraphicalWindow::SetFigureNameAndID();
 protected:
 
 	DECLARE_MESSAGE_MAP()
@@ -53,11 +55,18 @@ public:
 	bool m_bLButtonUp;
 	bool m_bFigureDone;
 	int m_nSelectedFigure;
+
+	std::set<CString> m_setNames;
+	std::set<int> m_setID;
+	CString m_FigureName;
+	int m_FigureID;
 protected:
 	std::vector<CPoint> m_pRectCoordinates;
 	bool m_bPaintNow;
 	bool m_bLButtonDown;
 	int m_nFigureType;
+
+	
 		
 };
 

@@ -41,6 +41,8 @@ public:
 	afx_msg void CEditorView::OnButtonNormalizeFigure();
 	afx_msg void CEditorView::OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void CEditorView::OnEditFigureAngle();
+	afx_msg void CEditorView::OnEditName();
+	afx_msg void CEditorView::OnEditID();
 	afx_msg void CEditorView::OnButtonLeftRotate();
 	afx_msg void CEditorView::OnButtonRightRotate();
 	afx_msg void CEditorView::OnButtonMove();
@@ -51,6 +53,10 @@ public:
 	void UpdateListView();
 	void MoveFigureElement(int nCurrentPosition, int nNewPosition);
 	void CEditorView::OnInitialUpdate();
+
+	int CEditorView::SetName();
+
+
 	// Generated message map functions
 protected:
 	afx_msg void OnPaint();
@@ -62,6 +68,8 @@ protected:
 	CComboBox m_CBoxBrushStyles;
 	CEdit m_EditPenWidth;
 	CEdit m_EditFigureAngle;
+	CEdit m_EditName;
+	CEdit m_EditID;
 	CButton m_ButChousePenColor;
 	CButton m_ButChouseBrushColor;
 	CButton m_ButNormalizeFigure;
@@ -73,9 +81,16 @@ protected:
 	std::vector<CString> PenStylesNames;
 	std::vector<CString> PenStylesNamesEx;
 	std::vector<CString> BrushStylesNames;
-	CStatic m_DrawingSpace;
 	CListCtrl m_List;
-	CStatic m_wndStaticAngle;
+	CStatic m_StaticAngle;
+	CStatic m_StaticPenType;
+	CStatic m_StaticPenWidth;
+	CStatic m_StaticBrush;
+	CStatic m_StaticName;
+	CStatic m_StaticNameWarning;
+	CStatic m_StaticID;
+	CStatic m_StaticIDWarning;
+
 	//CMyListView m_List;
 	//CListView m;
 };

@@ -27,10 +27,12 @@
 #define ID_BUT_RIGHT_ROTATE		1311
 #define ID_BUT_MOVE				1312
 #define ID_BUT_TRIANGLE			1313
-#define ID_STATIC_DRAWING_SPACE		1314
 #define ID_FIGURE_LIST			1315
 #define ID_BUT_DELETE			1316
 #define ID_STATIC				1317
+#define ID_ED_NAME				1318
+#define ID_ED_ID				1319
+
 // CChildView
 
 CEditorView::CEditorView()
@@ -66,6 +68,8 @@ BEGIN_MESSAGE_MAP(CEditorView, CWnd)
 	ON_COMMAND(ID_BUT_DELETE, OnButtonDelete)
 	ON_COMMAND(ID_BUT_TRIANGLE, OnButtonTriangle)
 	ON_NOTIFY(NM_CLICK, ID_FIGURE_LIST, OnNotify)
+	ON_EN_CHANGE(ID_ED_NAME, OnEditName)
+	ON_EN_CHANGE(ID_ED_ID, OnEditID)
 END_MESSAGE_MAP()
 
 
@@ -110,12 +114,12 @@ void CEditorView::OnPaint()
 	m_font.CreateFontIndirectW(&lf);
 	//dc.Ellipse(200, 200, 300, 350);
 	// TODO: Add your message handler code here
-	
 	// Do not call CWnd::OnPaint() for painting messages
 }
 
 int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+	
 	LOGFONT lf{
 		15,
 		0,
@@ -138,27 +142,57 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_font.CreateFontIndirectW(&lf);
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
-	m_DrawingSpace.Create(L"", WS_VISIBLE | WS_CHILD | WS_BORDER  /*| WS_VSCROLL | WS_HSCROLL | WS_SIZEBOX*/,
-		CRect(7, 7, 395, 500), this, ID_STATIC_DRAWING_SPACE);
 
 	m_GraphicalWindow.Create(L"", WS_VISIBLE | WS_CHILD  | WS_BORDER | SS_NOTIFY /*| WS_VSCROLL | WS_HSCROLL | WS_SIZEBOX*/,
-		CRect(10, 10, 390, 390), this, ID_OUTPUT_WINDOW);
+		CRect(), this, ID_OUTPUT_WINDOW);
 
+	int x = 10, y = 10;
 	CString str;
 	str.LoadString(IDS_BUT_RECTANGLE);
 	m_ButRect.Create(str, WS_VISIBLE | WS_CHILD | BS_FLAT,
-		CRect(400, 20, 500, 50), this, ID_BUT_RECTANGLE);
+		CRect(x, y, x + 100, y+25), this, ID_BUT_RECTANGLE);
 	m_ButRect.SetFont(&m_font);
-	//GetDlgItem(ID_BUT_RECTANGLE)->SendMessage(WM_SETFONT, WPARAM(HFONT(m_font)), 0);
 
+	x += 110;
 	m_ButTriangle.Create(L"Triangle", WS_VISIBLE | WS_CHILD,
-		CRect(510, 20, 600, 50), this, ID_BUT_TRIANGLE);
+		CRect(x, y, x + 100, y + 25), this, ID_BUT_TRIANGLE);
 
+	x += 110;
 	m_ButEllipse.Create(L"Ellipse", WS_VISIBLE | WS_CHILD ,
-		CRect(400, 70, 500, 100), this, ID_BUT_ELLIPSE);
+		CRect(x, y, x + 100, y + 25), this, ID_BUT_ELLIPSE);
 
-	m_CBoxPenStyles.Create(WS_VISIBLE | WS_CHILD  | WS_VSCROLL | CBS_DROPDOWNLIST |WS_VSCROLL,
-		CRect(400, 120, 710, 300), this, ID_CBOX_PEN_STYLES);
+	y += 30;
+	x = 10;
+	m_StaticName.Create(L"Name:", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
+		CRect(x, y, x + 100, y + 25), this, ID_STATIC);
+	x += 110;
+	m_EditName.Create(WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT,
+		CRect(x, y, x+290, y + 25), this, ID_ED_NAME);
+	x += 300;
+	m_StaticNameWarning.Create(L"This name has already was used.", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
+		CRect(x, y, x + 270, y + 25), this, ID_STATIC);
+	m_StaticNameWarning.ShowWindow(SW_HIDE);
+
+	y += 30;
+	x = 10;
+	m_StaticID.Create(L"ID:", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
+		CRect(x, y, x+100, y + 25), this, ID_STATIC);
+	x += 110;
+	m_EditID.Create(WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT | ES_NUMBER,
+		CRect(x, y, x+290, y+ 25), this, ID_ED_ID);
+	x += 300;
+	m_StaticIDWarning.Create(L"This ID has already was used.", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
+		CRect(x, y, x + 250, y + 25), this, ID_STATIC);
+	m_StaticIDWarning.ShowWindow(SW_HIDE);
+
+	y += 30;
+	x = 10;
+
+	m_StaticPenType.Create(L"Pen type:", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
+		CRect(x, y, x + 100, y+25), this, ID_STATIC);
+	x += 110;
+	m_CBoxPenStyles.Create(WS_VISIBLE | WS_CHILD | WS_VSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL,
+		CRect(x, y, x+290, y+250), this, ID_CBOX_PEN_STYLES);
 	for (int i = 0; i < PenStylesNames.size(); i++)
 	{
 		m_CBoxPenStyles.InsertString(i, PenStylesNames[i]);
@@ -167,70 +201,74 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	{
 		for (int i = 0; i < PenStylesNamesEx.size(); i++)
 		{
-			m_CBoxPenStyles.InsertString(i+ PenStylesNames.size(), PenStylesNamesEx[i]);
+			m_CBoxPenStyles.InsertString(i + PenStylesNames.size(), PenStylesNamesEx[i]);
 		}
 	}
 	m_CBoxPenStyles.SetCurSel(0);
+	x += 300;
+	m_ButChousePenColor.Create(L"Pen color", WS_VISIBLE | WS_CHILD,
+		CRect(x, y, x + 100, y + 25), this, ID_BUT_PEN_COLOR);
 
+	y += 30;
+	x = 10;
+	m_StaticBrush.Create(L"Brush type:", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
+		CRect(x, y, x + 100, y+25), this, ID_STATIC);
+	x += 110;
 	m_CBoxBrushStyles.Create(WS_VISIBLE | WS_CHILD  | WS_VSCROLL | CBS_DROPDOWNLIST,
-		CRect(400, 170, 710, 350), this, ID_CBOX_BRUSH_STYLES);
+		CRect(x, y, x+290, y+250), this, ID_CBOX_BRUSH_STYLES);
 	for (int i = 0; i < BrushStylesNames.size(); i++)
 	{
 		m_CBoxBrushStyles.InsertString(i, BrushStylesNames[i]);
 	}
 	m_CBoxBrushStyles.SetCurSel(0);
+	x += 300;
+	m_ButChouseBrushColor.Create(L"Brush color", WS_VISIBLE | WS_CHILD,
+		CRect(x, y, x + 100, y + 25), this, ID_BUT_BRUSH_COLOR);
 
-	m_EditPenWidth.Create(WS_VISIBLE | WS_CHILD | ES_NUMBER | WS_BORDER,
-		CRect(400, 220, 500, 250), this, ID_ED_PEN_WIDTH);
+	y += 30;
+	x = 10;
+
+	m_StaticPenWidth.Create(L"Pen width:", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
+		CRect(x, y, x + 100, y + 25), this, ID_STATIC);
+	x += 110;
+	m_EditPenWidth.Create(WS_VISIBLE | WS_CHILD | ES_NUMBER | WS_BORDER | SS_RIGHT,
+		CRect(x, y, x + 290, y + 25), this, ID_ED_PEN_WIDTH);
 	m_EditPenWidth.SetWindowTextW(L"1");
 
-	m_ButChousePenColor.Create(L"Pen", WS_VISIBLE | WS_CHILD ,
-		CRect(400, 270, 440, 300), this, ID_BUT_PEN_COLOR);
-
-	m_ButChouseBrushColor.Create(L"Brush", WS_VISIBLE | WS_CHILD ,
-		CRect(450, 270, 500, 300), this, ID_BUT_BRUSH_COLOR);
 
 	m_ButNormalizeFigure.Create(L"Normalize", WS_VISIBLE | WS_CHILD ,
-		CRect(400, 320, 500, 350), this, ID_BUT_NORM_FIGURE);
+		CRect(), this, ID_BUT_NORM_FIGURE);
 
 	m_ButMove.Create(L"Move", WS_VISIBLE | WS_CHILD ,
-		CRect(510, 320, 560, 350), this, ID_BUT_MOVE);
+		CRect(), this, ID_BUT_MOVE);
 
 	m_ButDelete.Create(L"Delete", WS_VISIBLE | WS_CHILD,
-		CRect(570, 320, 640, 350), this, ID_BUT_DELETE);
+		CRect(), this, ID_BUT_DELETE);
 
-	m_wndStaticAngle.Create(L"Angle:", WS_VISIBLE | WS_CHILD | WS_TABSTOP | SS_CENTERIMAGE | SS_RIGHT,
+	m_StaticAngle.Create(L"Angle:", WS_VISIBLE | WS_CHILD | WS_TABSTOP | SS_CENTERIMAGE | SS_RIGHT,
 		CRect(), this, ID_STATIC);
+
 	m_EditFigureAngle.Create(WS_VISIBLE | WS_CHILD | ES_NUMBER | WS_BORDER | SS_CENTERIMAGE | SS_RIGHT,
-		CRect(400, 370, 450, 400), this, ID_ED_FIGURE_ANGLE);
+		CRect(), this, ID_ED_FIGURE_ANGLE);
 	m_EditFigureAngle.SetWindowTextW(L"0");
 
 	m_ButLeftRotate.Create(L"To left", WS_VISIBLE | WS_CHILD ,
-		CRect(460, 370, 500, 400), this, ID_BUT_LEFT_ROTATE);
+		CRect(), this, ID_BUT_LEFT_ROTATE);
 
 	m_ButRightRotate.Create(L"To right", WS_VISIBLE | WS_CHILD ,
-		CRect(510, 370, 560, 400), this, ID_BUT_RIGHT_ROTATE);
+		CRect(), this, ID_BUT_RIGHT_ROTATE);
 
-	/*m_FigureList.Create(WS_VISIBLE | WS_CHILD | WS_BORDER, ,
-		this, ID_FIGURE_LIST);
-	m_FigureList.InsertColumn(0, L"¹", LVCFMT_LEFT, 40);*/
-	CRect rect(750, 10, 1500, 400);
-	m_List.Create( LVS_REPORT | WS_VISIBLE | WS_BORDER, rect, this, ID_FIGURE_LIST);
+	m_List.Create( LVS_REPORT | WS_VISIBLE | WS_BORDER, CRect(), this, ID_FIGURE_LIST);
 	m_List.SetExtendedStyle(LVS_EX_FULLROWSELECT);
-	//m_List.Create(L"", L"", WS_VISIBLE | WS_CHILD, rect, this, ID_FIGURE_LIST);
-	//m_List.GetListCtrl().Create(LVS_REPORT | WS_VISIBLE | LVS_EX_GRIDLINES, rect, this, ID_FIGURE_LIST);
-	//m_List.OnInitialUpdate();
+	
 	std::vector<CString> m_strColomns = {L"¹", L"Name", L"ID", L"Type", L"Center", L"Coordinates", L"Angle"};
-	m_List.InsertColumn(0, m_strColomns[0], LVCFMT_LEFT, 30);
-	m_List.InsertColumn(1, m_strColomns[1], LVCFMT_LEFT, 100);
-	m_List.InsertColumn(2, m_strColomns[2], LVCFMT_LEFT, 30);
-	m_List.InsertColumn(3, m_strColomns[3], LVCFMT_LEFT, 80);
-	m_List.InsertColumn(4, m_strColomns[4], LVCFMT_LEFT, 80);
-	m_List.InsertColumn(5, m_strColomns[5], LVCFMT_LEFT, 310);
-	m_List.InsertColumn(6, m_strColomns[6], LVCFMT_LEFT, 70);
+	std::vector<int> m_strColomnsSize = { 30, 100, 30, 80, 80, 310, 70};
+	for (int i = 0; i < 7; i++)
+	{
+		m_List.InsertColumn(i, m_strColomns[i], LVCFMT_LEFT, m_strColomnsSize[i]);
+	}
 	
 	return 0;
-
 }
 
 void CEditorView::OnButtonRect()
@@ -363,6 +401,8 @@ void CEditorView::OnButtonDelete()
 {
 	if (!m_GraphicalWindow.m_Figure.empty())
 	{
+		m_GraphicalWindow.m_setID.erase(_wtoi(m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetID()));
+		m_GraphicalWindow.m_setNames.erase(m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetName());
 		m_GraphicalWindow.m_Figure.erase(m_GraphicalWindow.m_Figure.begin() + m_GraphicalWindow.m_nSelectedFigure);
 		m_GraphicalWindow.m_nSelectedFigure = 0;
 		UpdateListView();
@@ -411,32 +451,72 @@ void CEditorView::MoveFigureElement(int nCurrentPosition, int nNewPosition)
 
 void CEditorView::OnSize(UINT nType, int cx, int cy)
 {
-
 	CRect EditorViewRect;
 	GetWindowRect(EditorViewRect);
 	ScreenToClient(EditorViewRect);
 
 	m_List.MoveWindow(CRect(cx - 710, 400, cx - 10, cy - 10));
+
 	m_ButDelete.MoveWindow(CRect(cx - 710, 370, cx - 610, 395));
 	m_ButNormalizeFigure.MoveWindow(CRect(cx - 600, 370, cx - 500, 395));
 	m_ButMove.MoveWindow(CRect(cx - 490, 370, cx - 390, 395));
-	m_wndStaticAngle.MoveWindow(CRect(cx - 380, 370, cx - 280, 395));
+	m_StaticAngle.MoveWindow(CRect(cx - 380, 370, cx - 280, 395));
 	m_EditFigureAngle.MoveWindow(CRect(cx - 270, 370, cx - 230, 395));
 	m_ButLeftRotate.MoveWindow(CRect(cx - 220, 370, cx - 120, 395));
 	m_ButRightRotate.MoveWindow(CRect(cx - 110, 370, cx - 10, 395));
-	/*
 
-	m_EditFigureAngle.Create(WS_VISIBLE | WS_CHILD | ES_NUMBER | WS_BORDER,
-		CRect(400, 370, 450, 400), this, ID_ED_FIGURE_ANGLE);
-	m_EditFigureAngle.SetWindowTextW(L"0");
+	m_GraphicalWindow.MoveWindow(CRect(10, 400, cx - 720, cy - 10));
 
-	m_ButLeftRotate.Create(L"Left", WS_VISIBLE | WS_CHILD,
-		CRect(460, 370, 500, 400), this, ID_BUT_LEFT_ROTATE);
 
-	m_ButRigthRotate.Create(L"Right", WS_VISIBLE | WS_CHILD,
-		CRect(510, 370, 560, 400), this, ID_BUT_RIGHT_ROTATE);*/
 }
 
+void CEditorView::OnEditName()
+{
+	CString strName, buffer = L"";
+	m_EditName.GetWindowText(strName);
+	int i = 1;
+	if (m_GraphicalWindow.m_setNames.find(strName) != m_GraphicalWindow.m_setNames.end())
+	{
+		/*while(m_GraphicalWindow.m_setNames.find(buffer.Format(L"%s %d", strName, i)) == m_GraphicalWindow.m_setNames.end())
+		{
+			i++;
+		} */
+		do
+		{
+			buffer.Format(L"%s(%d)", strName, i);
+			i++;
+		} while (m_GraphicalWindow.m_setNames.find(buffer) != m_GraphicalWindow.m_setNames.end());
+
+		m_StaticNameWarning.ShowWindow(SW_SHOW);
+		m_GraphicalWindow.m_FigureName = buffer;
+	}
+	else
+	{
+		m_StaticNameWarning.ShowWindow(SW_HIDE);
+		m_GraphicalWindow.m_FigureName = strName;
+	}
+	
+}
+
+void CEditorView::OnEditID()
+{
+	CString strEditText;
+	m_EditID.GetWindowText(strEditText);
+	int id = _wtoi(strEditText);
+	if (m_GraphicalWindow.m_setID.find(id) != m_GraphicalWindow.m_setID.end())
+	{
+		m_StaticIDWarning.ShowWindow(SW_SHOW);
+		do 
+		{
+			id++;
+		} while (m_GraphicalWindow.m_setID.find(id) != m_GraphicalWindow.m_setID.end());
+	}
+	else
+	{
+		m_StaticIDWarning.ShowWindow(SW_HIDE);
+	}
+	m_GraphicalWindow.m_FigureID = id;
+}
 
 void CEditorView::OnNotify(NMHDR* pNotifyStruct, LRESULT* result)
 {
