@@ -39,14 +39,31 @@ public:
 	virtual void Normalize();
 	virtual void Rotate();
 	void SetAngle(int nAngle);
-	void SetBrushAndPen();
+	void SetBrush();
+	void SetPen();
 	virtual int GetNumberVertices();
 	virtual void SetVertice(int nNumberVertice, CPoint point);
+	void SetDlgAngle(int nAngle);
+	void SetDlgColorValue(COLORREF crColor, bool bPenBrush);
+	void SetDlgWidth(int nWidth);
+	void SetDlgPenStyle(int nStyle);
+	void SetDlgBrushStyle(int nStyle);
+	void SetDlgName(CString strName);
+	void SetDlgID(int nID);
+	virtual void SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate);
+	virtual void UpdateCoordinate(int nVertice);
 
 	CString GetName();
 	CString GetID();
-	CString GetCenter();
-	virtual CString GetCoordinates();
+	int GetWidth();
+	int GetPenStyle();
+	COLORREF GetPenColor();
+	int GetBrushStyle();
+	COLORREF GetBrushColor();
+	CString GetStrCenter();
+	CPoint GetCenter();
+	virtual CString GetStrCoordinates();
+	virtual CPoint* GetCoordinates();
 	CString GetAngle();
 	CString CFigure::GetFigure();
 
@@ -61,8 +78,9 @@ protected:
 	COLORREF m_crBrushColor;
 	int m_nAngle;
 	bool bLeftRightRotate;
-	CPen m_Pen;
-	CBrush m_Brush;
+	CPen *m_ptrPen;
+	CBrush *m_ptrBrush;
+	//CGraphicalWindow *ptr;
 public:
 	CPoint m_vCoordinates[4];
 	CPoint m_vAngleCoordinates[4];
@@ -79,5 +97,12 @@ enum FigureType
 	FIGURE_RECTANGLE,
 	FIGURE_TRIANGLE,
 	FIGURE_MOVE
+};
+
+enum RGB
+{
+	R_VALUE = 0,
+	G_VALUE,
+	B_VALUE
 };
 

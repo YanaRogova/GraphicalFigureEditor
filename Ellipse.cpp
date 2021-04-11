@@ -36,8 +36,11 @@ void CEllipse::NewCoordinates(int xHalfLength, int yHalfLength)
 
 void CEllipse::DrawFigure(CDC* pDC)
 {
-	pDC->SelectObject(&m_Brush);
-	pDC->SelectObject(&m_Pen);
+	pDC->SelectObject(m_ptrBrush);
+	pDC->SelectObject(m_ptrPen);
+
+	HDC hdc = static_cast<HDC>(*pDC);
+	SetBkMode(hdc, TRANSPARENT);
 
 	Rotate();
 	pDC->BeginPath();
@@ -92,7 +95,7 @@ void CEllipse::Normalize()
 	NewCoordinates(m_xHalfLength, m_yHalfLength);
 }
 
-CString CEllipse::GetCoordinates()
+CString CEllipse::GetStrCoordinates()
 {
 	CString str;
 	//if (m_nAngle == 0)
@@ -104,3 +107,39 @@ CString CEllipse::GetCoordinates()
 	*/
 	return str;
 }
+
+CPoint* CEllipse::GetCoordinates()
+{
+	return m_vCoordinates;
+}
+
+void CEllipse::SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate)
+{
+	if (bXOrY)
+	{
+		m_vCoordinates[nVertice].x = nCoordinate;
+	}
+	else
+	{
+		m_vCoordinates[nVertice].y = nCoordinate;
+	}
+	if (m_nAngle != 0)
+		UpdateCoordinate(nVertice);
+}
+
+void CEllipse::UpdateCoordinate(int nVertice)
+{
+	m_nAngle *= -1;
+	/*m_vCoordinates[nVertice] = RotatePoint(-(m_CenterCoordinates.x - m_vAngleCoordinates[nVertice].x),
+		-(m_CenterCoordinates.y - m_vAngleCoordinates[nVertice].y));
+	m_vCoordinates[nVertice] = CPoint(m_CenterCoordinates.x + m_vCoordinates[nVertice].x,
+		m_CenterCoordinates.y + m_vCoordinates[nVertice].y);*/
+	m_vCoordinates[nVertice] = RotatePoint(-m_CenterCoordinates.x + m_vCoordinates[nVertice].x,
+		-m_CenterCoordinates.y + m_vAngleCoordinates[nVertice].y);
+	m_vCoordinates[nVertice] = CPoint(m_CenterCoordinates.x + m_vCoordinates[nVertice].x,
+		m_CenterCoordinates.y + m_vCoordinates[nVertice].y);
+	m_nAngle *= -1;
+	SetCoordinates(CPoint());
+	NewCoordinates(m_xHalfLength, m_yHalfLength);
+}
+

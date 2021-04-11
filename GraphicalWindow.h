@@ -6,6 +6,7 @@
 #include "Rectangle.h"
 #include "Ellipse.h"
 #include "Triangle.h"
+
 //class CGraphicalWindow : public CWnd
 //{
 //protected:
@@ -37,15 +38,19 @@ public:
 	void CGraphicalWindow::SetFigureType(int nFigureType);
 	void CGraphicalWindow::UpdateList();
 	void CGraphicalWindow::SetFigureNameAndID();
+
+	void CGraphicalWindow::MoveFigure(CPoint point);
 protected:
 
 	DECLARE_MESSAGE_MAP()
 	//void CGraphicalWindow::GetCoordinates(CPoint point);
 	//void CGraphicalWindow::DrawRectangle();
 	
+	
+public: 
 	std::vector<int> PenStyles;
 	std::vector<int> BrushStyles;
-public: 
+
 	int m_nFigurePenStyles;
 	int m_nFigureBrushStyles;
 	int m_nFigurePenWidth;

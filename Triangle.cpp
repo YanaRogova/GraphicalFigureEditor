@@ -119,8 +119,11 @@ void CTriangle::SetCoordinates(CPoint point)
 
 void CTriangle::DrawFigure(CDC* pDC)
 {
-	pDC->SelectObject(&m_Brush);
-	pDC->SelectObject(&m_Pen);
+	pDC->SelectObject(m_ptrBrush);
+	pDC->SelectObject(m_ptrPen);
+
+	HDC hdc = static_cast<HDC>(*pDC);
+	SetBkMode(hdc, TRANSPARENT);
 
 	if (m_nAngle == 0)
 		pDC->Polygon(&m_vCoordinates[0], 3);
@@ -172,8 +175,8 @@ void CTriangle::Rotate()
 		int y = ((m_CenterCoordinates.y - m_vCoordinates[i].y) > 0) ? (m_CenterCoordinates.y - m_vCoordinates[i].y) :
 			(m_vCoordinates[i].y - m_CenterCoordinates.y);
 		m_vAngleCoordinates[i] = RotatePoint(x, y);*/
-		m_vAngleCoordinates[i] = CPoint(m_CenterCoordinates.x - m_vAngleCoordinates[i].x,
-			m_CenterCoordinates.y - m_vAngleCoordinates[i].y);
+		m_vAngleCoordinates[i] = CPoint(m_CenterCoordinates.x + m_vAngleCoordinates[i].x,
+			m_CenterCoordinates.y + m_vAngleCoordinates[i].y);
 	}
 	/*m_vAngleCoordinates[1].x = m_vCoordinates[1].x;
 	m_vAngleCoordinates[1].y = m_vCoordinates[1].y;
@@ -210,7 +213,7 @@ void CTriangle::Normalize()
 	NewCoordinates(m_xHalfLength, m_yHalfLength);
 }
 
-CString CTriangle::GetCoordinates()
+CString CTriangle::GetStrCoordinates()
 {
 	CString str;
 	if (m_nAngle == 0)
@@ -220,4 +223,42 @@ CString CTriangle::GetCoordinates()
 		str.Format(L"{(%d, %d), (%d, %d), (%d, %d)}", m_vAngleCoordinates[0].x, m_vAngleCoordinates[0].y, m_vAngleCoordinates[1].x,
 			m_vAngleCoordinates[1].y, m_vAngleCoordinates[2].x, m_vAngleCoordinates[2].y);
 	return str;
+}
+
+CPoint* CTriangle::GetCoordinates()
+{
+	if (m_nAngle == 0)
+		return m_vCoordinates;
+	else
+		return m_vAngleCoordinates;
+}
+
+void CTriangle::SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate)
+{
+	if (bXOrY)
+	{
+		m_vCoordinates[nVertice].x = nCoordinate;
+	}
+	else
+	{
+		m_vCoordinates[nVertice].y = nCoordinate;
+	}
+	if (m_nAngle != 0)
+		UpdateCoordinate(nVertice);
+}
+
+void CTriangle::UpdateCoordinate(int nVertice)
+{
+	m_nAngle *= -1;
+	/*m_vCoordinates[nVertice] = RotatePoint(-(m_CenterCoordinates.x - m_vAngleCoordinates[nVertice].x),
+		-(m_CenterCoordinates.y - m_vAngleCoordinates[nVertice].y));
+	m_vCoordinates[nVertice] = CPoint(m_CenterCoordinates.x + m_vCoordinates[nVertice].x,
+		m_CenterCoordinates.y + m_vCoordinates[nVertice].y);*/
+	m_vCoordinates[nVertice] = RotatePoint(-m_CenterCoordinates.x + m_vCoordinates[nVertice].x,
+		-m_CenterCoordinates.y + m_vAngleCoordinates[nVertice].y);
+	m_vCoordinates[nVertice] = CPoint(m_CenterCoordinates.x + m_vCoordinates[nVertice].x,
+		m_CenterCoordinates.y + m_vCoordinates[nVertice].y);
+	m_nAngle *= -1;
+	SetCoordinates(CPoint());
+	NewCoordinates(m_xHalfLength, m_yHalfLength);
 }

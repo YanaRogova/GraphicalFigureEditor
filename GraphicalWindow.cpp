@@ -18,12 +18,13 @@ CGraphicalWindow::CGraphicalWindow()
 	m_bPaintNow = FALSE;
 	m_bLButtonDown = FALSE;
 	m_bLButtonUp = TRUE;
-	PenStyles = { PS_SOLID, PS_NULL, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOTDOT};
+	PenStyles = { PS_SOLID | PS_GEOMETRIC, PS_NULL, PS_DASH | PS_GEOMETRIC, PS_DOT | PS_GEOMETRIC, PS_DASHDOT | PS_GEOMETRIC,
+		PS_DASHDOTDOT | PS_GEOMETRIC };
 	m_nFigurePenStyles = 0;
 	m_nFigureType = -1;
 	m_crFigurePenColor = RGB(0, 0, 0);
 	m_crFigureBrushColor = RGB(255, 255, 255);
-	BrushStyles = { -1, HS_VERTICAL, HS_HORIZONTAL, HS_CROSS, HS_BDIAGONAL, HS_FDIAGONAL, HS_DIAGCROSS };
+	BrushStyles = { -1, -2, HS_VERTICAL, HS_HORIZONTAL, HS_CROSS, HS_BDIAGONAL, HS_FDIAGONAL, HS_DIAGCROSS };
 	m_nFigureBrushStyles = 0;
 	m_bFigureDone = TRUE;
 	m_nSelectedFigure = -1;
@@ -55,30 +56,7 @@ void CGraphicalWindow::OnPaint()
 	{
 		if (m_Figure[i]->GetCanDraw())
 		{
-			
-			//switch (m_Figure[i]->GetFigureType())
-			//{
-			//case FIGURE_ELLIPSE:
-			//	//if (m_Figure[i].m_vCoordinates.size() == 2)
-			//	//{
-			//	//pDC->Ellipse(m_Figure[i]->m_vCoordinates[0].x, m_Figure[i]->m_vCoordinates[0].y,
-			//		//m_Figure[i]->m_vCoordinates[1].x, m_Figure[i]->m_vCoordinates[1].y);
-
-			//	//m_bPaintNow = FALSE;
-			////}
-			//	//break;
-			//case FIGURE_RECTANGLE:
-			//	//if (m_Figure[i].m_vCoordinates.size() == 2)
-			//	//{
-			//	
-
-			//	//m_bPaintNow = FALSE;
-			////}
-			////m_nFigureType = -1;
-			//case FIGURE_TRIANGLE:
-				m_Figure[i]->DrawFigure(pDC);
-			/*	break;
-			}*/
+			m_Figure[i]->DrawFigure(pDC);
 		}
 		
 	}
@@ -169,12 +147,12 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 		case FIGURE_MOVE:
 			if (!m_bFigureDone)
 			{
+				m_setID.erase(_wtoi(m_Figure[m_Figure.size() - 1]->GetID()));
+				m_setNames.erase(m_Figure[m_Figure.size() - 1]->GetName());
 				m_Figure.pop_back();
 				m_bFigureDone = TRUE;
 			}
-				
-			if (!m_Figure.empty())
-				m_Figure[m_nSelectedFigure]->Move(point);
+			MoveFigure(point);
 			UpdateList();
 			break;
 		}
@@ -199,7 +177,12 @@ void CGraphicalWindow::OnLButtonUp(UINT nFlags, CPoint point)
 				//SetFigureNameAndID();
 			}
 			else
+			{
+				m_setID.erase(_wtoi(m_Figure[m_Figure.size() - 1]->GetID()));
+				m_setNames.erase(m_Figure[m_Figure.size() - 1]->GetName());
 				m_Figure.pop_back();
+			}
+				
 			UpdateList();
 			//m_nFigureType = -1;
 			break;
@@ -210,7 +193,7 @@ void CGraphicalWindow::OnLButtonUp(UINT nFlags, CPoint point)
 				m_Figure[m_nSelectedFigure]->SetCoordinates(point);
 				UpdateList();
 				m_bFigureDone = TRUE;
-				SetFigureNameAndID();
+				//SetFigureNameAndID();
 			}
 			break;
 		}
@@ -260,9 +243,12 @@ BOOL CGraphicalWindow::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
 	if (!m_Figure.empty())
 	{
 		if(zDelta > 0)
-			m_Figure[m_Figure.size() - 1]->Resize(true);
+			m_Figure[m_nSelectedFigure]->Resize(true);
 		else
-			m_Figure[m_Figure.size() - 1]->Resize(false);
+			m_Figure[m_nSelectedFigure]->Resize(false);
+		CEditorView* pView = static_cast<CEditorView*>(GetParent());
+		pView->UpdateListView();
+		pView->m_dlgFigureProperties.SetData();
 		OnPaint();
 	}
 	return 1;
@@ -274,6 +260,7 @@ void CGraphicalWindow::UpdateList()
 	//CWnd* = GetParent();
 	CEditorView* pView = static_cast<CEditorView*>(GetParent());
 	pView->UpdateListView();
+	pView->m_dlgFigureProperties.SetData();
 }
 
 void CGraphicalWindow::SetFigureNameAndID()
@@ -281,4 +268,14 @@ void CGraphicalWindow::SetFigureNameAndID()
 	CEditorView* pView = static_cast<CEditorView*>(GetParent());
 	pView->OnEditName();
 	pView->OnEditID();
+}
+
+void CGraphicalWindow::MoveFigure(CPoint point)
+{
+	if (!m_Figure.empty())
+	{
+		m_Figure[m_nSelectedFigure]->Move(point);
+		CEditorView* pView = static_cast<CEditorView*>(GetParent());
+		pView->m_dlgFigureProperties.SetData();
+	}
 }

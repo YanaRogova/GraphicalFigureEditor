@@ -6,6 +6,7 @@
 #pragma once
 #include "afxcview.h"
 #include "GraphicalWindow.h"
+#include "DlgProperties.h"
 
 // CChildView window
 class CMyListView : public CListView
@@ -19,11 +20,17 @@ public:
 
 
 
+
 class CEditorView : public CWnd
 {
 // Construction
 public:
 	CEditorView();
+	
+	std::vector<CString> PenStylesNames;
+	std::vector<CString> BrushStylesNames;
+
+	CDlgProperties m_dlgFigureProperties;
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 // Implementation
@@ -48,15 +55,32 @@ public:
 	afx_msg void CEditorView::OnButtonMove();
 	afx_msg void CEditorView::OnButtonDelete();
 	afx_msg void CEditorView::OnButtonTriangle();
+
+	bool CEditorView::FigureListNotEmpty();
+
 	afx_msg void OnNotify(NMHDR* pNotifyStruct, LRESULT* result);
 	COLORREF CEditorView::GetColor();
 	void UpdateListView();
 	void MoveFigureElement(int nCurrentPosition, int nNewPosition);
 	void CEditorView::OnInitialUpdate();
 
+	void CEditorView::FillComboBox(std::vector<CString> vItems, CComboBox &cbox);
+	void CEditorView::MoveFigureWithDlg(CPoint point);
+	void CEditorView::UpdateWidth(int nWidth);
+	void CEditorView::UpdatePenType(int nType);
+	void CEditorView::UpdateBrushType(int nType);
+	void CEditorView::UpdateName(CString strName);
+	void CEditorView::UpdateID(int nID);
+	void CEditorView::UpdateCoordinate(int nVertice, bool bXOrY, int nCoordinate);
+	void SetDlgData(CString& strFigure, CString &strName, int &nID, int &nAngle, int &nWidth, int &nPenStyle, int &nBrushStyle, CPoint &Center,
+		CPoint* Vertices, int* nPenColor, int* nBrushColor);
+
 	int CEditorView::SetName();
-
-
+	int CEditorView::SetUniqueID(int id);
+	CString CEditorView::SetUniqueName(CString strEditText);
+	void CEditorView::UpdateAngle(int nAngle);
+	void CEditorView::SetColorValue(COLORREF crColor, bool bPenBrush);
+	CString CEditorView::GetFigureType();
 	// Generated message map functions
 protected:
 	afx_msg void OnPaint();
@@ -78,9 +102,6 @@ protected:
 	CButton m_ButMove;
 	CButton m_ButDelete;
 	CButton m_ButTriangle;
-	std::vector<CString> PenStylesNames;
-	std::vector<CString> PenStylesNamesEx;
-	std::vector<CString> BrushStylesNames;
 	CListCtrl m_List;
 	CStatic m_StaticAngle;
 	CStatic m_StaticPenType;
@@ -91,6 +112,7 @@ protected:
 	CStatic m_StaticID;
 	CStatic m_StaticIDWarning;
 
+	
 	//CMyListView m_List;
 	//CListView m;
 };

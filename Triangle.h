@@ -17,8 +17,10 @@ public:
 	int GetNumberVertices() override;
 	void SetNumberVertices(int nNumber);
 	void SetVertice(int nNumberVertice, CPoint point) override;
-	CString GetCoordinates();
-
+	CString GetStrCoordinates();
+	CPoint* GetCoordinates();
+	void SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate);
+	void UpdateCoordinate(int nVertice);
 protected:
 	int m_nVertices;
 	//bool m_bCanDraw;

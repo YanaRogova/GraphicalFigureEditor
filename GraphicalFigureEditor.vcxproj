@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DlgProperties.h" />
     <ClInclude Include="EditorView.h" />
     <ClInclude Include="Ellipse.h" />
     <ClInclude Include="Figure.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DlgProperties.cpp" />
     <ClCompile Include="EditorView.cpp" />
     <ClCompile Include="Ellipse.cpp" />
     <ClCompile Include="Figure.cpp" />

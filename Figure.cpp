@@ -5,7 +5,7 @@
 
 CFigure::CFigure(int nFigureType, int nPenStyle, int nPenWidth, COLORREF crPenColor,
 	int nBrushStyle, COLORREF crBrushColor, CString strName, unsigned int id) : 
-	m_figureNameID(strName, id), m_Pen(), m_Brush()
+	m_figureNameID(strName, id)
 {
 	m_nFigureType = nFigureType;
 	//m_nVertices = 0;
@@ -18,12 +18,17 @@ CFigure::CFigure(int nFigureType, int nPenStyle, int nPenWidth, COLORREF crPenCo
 	m_nAngle = 0;
 	m_xHalfLength = 0.0;
 	m_yHalfLength = 0.0;
-	SetBrushAndPen();
+	m_ptrPen = nullptr;
+	m_ptrBrush = nullptr;
+	SetBrush();
+	SetPen();
+	//*ptr = static_cast<CGraphicalWindow*>(GetParent());
 }
 
 CFigure::~CFigure()
 {
-
+	delete m_ptrBrush;
+	delete m_ptrPen;
 }
 
 
@@ -47,6 +52,7 @@ void CFigure::DrawFigure(CDC* pDC)
 		brush.CreateSolidBrush(m_crBrushColor);
 	else
 		brush.CreateHatchBrush(m_nBrushStyle, m_crBrushColor);
+
 	pDC->SelectObject(&brush);
 	CPen pen(m_nPenStyle, m_nPenWidth, m_crPenColor);
 	pDC->SelectObject(&pen);
@@ -137,6 +143,12 @@ void CFigure::SetAngle(int nAngle)
 	m_nAngle = m_nAngle % 360;
 }
 
+void CFigure::SetDlgAngle(int nAngle)
+{
+	m_nAngle = 0;
+	SetAngle(nAngle);
+}
+
 void CFigure::Move(CPoint point)
 {
 	m_CenterCoordinates = point;
@@ -151,14 +163,30 @@ void CFigure::NewCoordinates(int xHalfLength, int yHalfLength)
 	m_vCoordinates[3] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y - yHalfLength);
 }
 
-void CFigure::SetBrushAndPen()
+void CFigure::SetBrush()
 {
+	LOGBRUSH logBrush;
+	logBrush.lbStyle = BS_HATCHED;
+	logBrush.lbColor = m_crBrushColor;
+	logBrush.lbHatch = m_nBrushStyle;
+	m_ptrBrush = new CBrush;
 	if (m_nBrushStyle == -1)
-		m_Brush.CreateSolidBrush(m_crBrushColor);
-	else
-		m_Brush.CreateHatchBrush(m_nBrushStyle, m_crBrushColor);
+		logBrush.lbStyle = BS_SOLID;
+	else if (m_nBrushStyle == -2)
+		logBrush.lbStyle = BS_NULL;
+		//m_ptrBrush->CreateHatchBrush(m_nBrushStyle, m_crBrushColor);
+		
+		m_ptrBrush->CreateBrushIndirect(&logBrush);
+}
 
-	m_Pen.CreatePen(m_nPenStyle, m_nPenWidth, m_crPenColor);
+void CFigure::SetPen()
+{
+	LOGBRUSH logBrush;
+	logBrush.lbStyle = BS_SOLID;
+	logBrush.lbColor = m_crPenColor;
+
+	m_ptrPen = new CPen;
+	m_ptrPen->CreatePen(m_nPenStyle, m_nPenWidth, &logBrush);
 }
 
 
@@ -183,16 +211,51 @@ CString CFigure::GetID()
 	return str;
 }
 
-CString CFigure::GetCenter()
+int CFigure::GetWidth()
+{
+	return m_nPenWidth;
+}
+
+int CFigure::GetPenStyle()
+{
+	return m_nPenStyle;
+}
+
+COLORREF CFigure::GetPenColor()
+{
+	return m_crPenColor;
+}
+
+int CFigure::GetBrushStyle()
+{
+	return m_nBrushStyle;
+}
+
+COLORREF CFigure::GetBrushColor()
+{
+	return m_crBrushColor;
+}
+
+CString CFigure::GetStrCenter()
 {
 	CString str;
 	str.Format(L"(%d, %d)", m_CenterCoordinates.x, m_CenterCoordinates.y);
 	return str;
 }
 
-CString CFigure::GetCoordinates()
+CPoint CFigure::GetCenter()
+{
+	return m_CenterCoordinates;
+}
+
+CString CFigure::GetStrCoordinates()
 {
 	return L"";
+}
+
+CPoint* CFigure::GetCoordinates()
+{
+	return m_vCoordinates;
 }
 
 CString CFigure::GetAngle()
@@ -216,4 +279,65 @@ CString CFigure::GetFigure()
 		break;
 	}
 	return L"";
+}
+
+void CFigure::SetDlgColorValue(COLORREF crColor, bool bPenBrush)
+{
+	if (bPenBrush)
+	{
+		m_crPenColor = crColor;
+		delete m_ptrPen;
+		m_ptrPen = nullptr;
+		SetPen();
+	}
+	else
+	{
+		m_crBrushColor = crColor;
+		delete m_ptrBrush;
+		m_ptrBrush = nullptr;
+		SetBrush();
+	}
+}
+
+void CFigure::SetDlgWidth(int nWidth)
+{
+	m_nPenWidth = nWidth;
+	delete m_ptrPen;
+	m_ptrPen = nullptr;
+	SetPen();
+}
+
+void CFigure::SetDlgPenStyle(int nStyle)
+{
+	m_nPenStyle = nStyle;
+	delete m_ptrPen;
+	m_ptrPen = nullptr;
+	SetPen();
+}
+
+void CFigure::SetDlgBrushStyle(int nStyle)
+{
+	m_nBrushStyle = nStyle;
+	delete m_ptrBrush;
+	m_ptrBrush = nullptr;
+	SetBrush();
+}
+
+void CFigure::SetDlgName(CString strName)
+{
+	m_figureNameID.SetName(strName);
+}
+
+void CFigure::SetDlgID(int nID)
+{
+	m_figureNameID.SetID(nID);
+}
+
+void CFigure::SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate)
+{
+	
+}
+void CFigure::UpdateCoordinate(int nVertice)
+{
+	
 }

@@ -8,7 +8,6 @@
 #include "EditorView.h"
 #include "resource.h"
 //#include "Figure.h"
-#include "GraphicalWindow.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -32,14 +31,16 @@
 #define ID_STATIC				1317
 #define ID_ED_NAME				1318
 #define ID_ED_ID				1319
+#define ID_DLG_FIGURE			1319
+
 
 // CChildView
 
 CEditorView::CEditorView()
 {
-	PenStylesNames = { L"Solid", L"Null" };
-	PenStylesNamesEx = { L"Dashed", L"Dotted", L"Alternating dashes and dots", L"Alternating dashes and double dots" };
-	BrushStylesNames = { L"Solid", L"Vertical hatch", L"Horizontal hatch", L"Horizontal and vertical crosshatch",
+	PenStylesNames = { L"Solid", L"Null", L"Dashes", L"Dotted", L"Alternating dashes and dots", 
+		L"Alternating dashes and two dots" };
+	BrushStylesNames = { L"Solid", L"Null", L"Vertical hatch", L"Horizontal hatch", L"Horizontal and vertical crosshatch",
 		L"Downward hatch at 45 degrees", L"Upward hatch at 45 degrees", L"Crosshatch at 45 degrees" };
 }
 
@@ -146,6 +147,9 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_GraphicalWindow.Create(L"", WS_VISIBLE | WS_CHILD  | WS_BORDER | SS_NOTIFY /*| WS_VSCROLL | WS_HSCROLL | WS_SIZEBOX*/,
 		CRect(), this, ID_OUTPUT_WINDOW);
 
+	m_dlgFigureProperties.Create(IDD_DLG_PROPERTIES, this);
+	m_dlgFigureProperties.ShowWindow(SW_HIDE);
+
 	int x = 10, y = 10;
 	CString str;
 	str.LoadString(IDS_BUT_RECTANGLE);
@@ -191,20 +195,17 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_StaticPenType.Create(L"Pen type:", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
 		CRect(x, y, x + 100, y+25), this, ID_STATIC);
 	x += 110;
+
+
+
 	m_CBoxPenStyles.Create(WS_VISIBLE | WS_CHILD | WS_VSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL,
 		CRect(x, y, x+290, y+250), this, ID_CBOX_PEN_STYLES);
-	for (int i = 0; i < PenStylesNames.size(); i++)
+	FillComboBox(PenStylesNames, m_CBoxPenStyles);
+	/*for (int i = 0; i < PenStylesNames.size(); i++)
 	{
 		m_CBoxPenStyles.InsertString(i, PenStylesNames[i]);
 	}
-	if (m_GraphicalWindow.m_nFigurePenWidth <= 1)
-	{
-		for (int i = 0; i < PenStylesNamesEx.size(); i++)
-		{
-			m_CBoxPenStyles.InsertString(i + PenStylesNames.size(), PenStylesNamesEx[i]);
-		}
-	}
-	m_CBoxPenStyles.SetCurSel(0);
+	m_CBoxPenStyles.SetCurSel(0);*/
 	x += 300;
 	m_ButChousePenColor.Create(L"Pen color", WS_VISIBLE | WS_CHILD,
 		CRect(x, y, x + 100, y + 25), this, ID_BUT_PEN_COLOR);
@@ -216,11 +217,12 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	x += 110;
 	m_CBoxBrushStyles.Create(WS_VISIBLE | WS_CHILD  | WS_VSCROLL | CBS_DROPDOWNLIST,
 		CRect(x, y, x+290, y+250), this, ID_CBOX_BRUSH_STYLES);
-	for (int i = 0; i < BrushStylesNames.size(); i++)
+	FillComboBox(BrushStylesNames, m_CBoxBrushStyles);
+	/*for (int i = 0; i < BrushStylesNames.size(); i++)
 	{
 		m_CBoxBrushStyles.InsertString(i, BrushStylesNames[i]);
 	}
-	m_CBoxBrushStyles.SetCurSel(0);
+	m_CBoxBrushStyles.SetCurSel(0);*/
 	x += 300;
 	m_ButChouseBrushColor.Create(L"Brush color", WS_VISIBLE | WS_CHILD,
 		CRect(x, y, x + 100, y + 25), this, ID_BUT_BRUSH_COLOR);
@@ -262,7 +264,7 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_List.SetExtendedStyle(LVS_EX_FULLROWSELECT);
 	
 	std::vector<CString> m_strColomns = {L"¹", L"Name", L"ID", L"Type", L"Center", L"Coordinates", L"Angle"};
-	std::vector<int> m_strColomnsSize = { 30, 100, 30, 80, 80, 310, 70};
+	std::vector<int> m_strColomnsSize = { 30, 115, 30, 80, 80, 310, 55};
 	for (int i = 0; i < 7; i++)
 	{
 		m_List.InsertColumn(i, m_strColomns[i], LVCFMT_LEFT, m_strColomnsSize[i]);
@@ -291,6 +293,7 @@ void CEditorView::OnCBoxBrushStyles()
 	m_GraphicalWindow.m_nFigureBrushStyles = m_CBoxBrushStyles.GetCurSel();
 }
 
+
 void CEditorView::OnEditPenWidth()
 {
 	int nOldEditState = m_GraphicalWindow.m_nFigurePenWidth;
@@ -298,25 +301,6 @@ void CEditorView::OnEditPenWidth()
 	m_EditPenWidth.GetWindowText(strEditText);
 	m_GraphicalWindow.m_nFigurePenWidth = _wtoi(strEditText);
 
-	if ((nOldEditState > 1 && m_GraphicalWindow.m_nFigurePenWidth <= 1) ||
-		(nOldEditState <= 1 && m_GraphicalWindow.m_nFigurePenWidth > 1))
-	{
-		m_CBoxPenStyles.ResetContent();
-
-		for (int i = 0; i < PenStylesNames.size(); i++)
-		{
-			m_CBoxPenStyles.InsertString(i, PenStylesNames[i]);
-		}
-
-		if (m_GraphicalWindow.m_nFigurePenWidth <= 1)
-		{
-			for (int i = 0; i < PenStylesNamesEx.size(); i++)
-			{
-				m_CBoxPenStyles.InsertString(i + PenStylesNames.size(), PenStylesNamesEx[i]);
-			}
-		}
-		m_CBoxPenStyles.SetCurSel(0);
-	}
 	OnCBoxPenStyles();	//to update ComboBox state
 }
 
@@ -353,6 +337,7 @@ void CEditorView::OnButtonNormalizeFigure()
 		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->Normalize();
 		m_GraphicalWindow.OnPaint();
 		UpdateListView();
+		m_dlgFigureProperties.SetData();
 	}
 }
 
@@ -376,6 +361,7 @@ void CEditorView::OnButtonLeftRotate()
 		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetAngle(_wtoi(strEditText));
 		m_GraphicalWindow.OnPaint();
 		UpdateListView();
+		m_dlgFigureProperties.SetData();
 	}
 }
 
@@ -387,7 +373,8 @@ void CEditorView::OnButtonRightRotate()
 		m_EditFigureAngle.GetWindowText(strEditText);
 		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetAngle(-_wtoi(strEditText));
 		m_GraphicalWindow.OnPaint();
-		UpdateListView();
+		UpdateListView(); 
+		m_dlgFigureProperties.SetData();
 	}
 }
 
@@ -396,6 +383,9 @@ void CEditorView::OnButtonMove()
 	m_GraphicalWindow.SetFigureType(FIGURE_MOVE);
 	UpdateListView();
 }
+
+
+
 
 void CEditorView::OnButtonDelete()
 {
@@ -406,6 +396,7 @@ void CEditorView::OnButtonDelete()
 		m_GraphicalWindow.m_Figure.erase(m_GraphicalWindow.m_Figure.begin() + m_GraphicalWindow.m_nSelectedFigure);
 		m_GraphicalWindow.m_nSelectedFigure = 0;
 		UpdateListView();
+		m_dlgFigureProperties.SetData();
 		m_GraphicalWindow.OnPaint();
 	}
 }
@@ -414,7 +405,7 @@ void CEditorView::OnButtonTriangle()
 {
 	m_GraphicalWindow.SetFigureType(FIGURE_TRIANGLE);
 	//MoveFigureElement(m_GraphicalWindow.m_Figure.size() - 1, 0);
-	UpdateListView();
+	//UpdateListView();
 }
 
 void CEditorView::UpdateListView()
@@ -428,13 +419,18 @@ void CEditorView::UpdateListView()
 		m_List.SetItemText(Index, 1, m_GraphicalWindow.m_Figure[i]->GetName());
 		m_List.SetItemText(Index, 2, m_GraphicalWindow.m_Figure[i]->GetID());
 		m_List.SetItemText(Index, 3, m_GraphicalWindow.m_Figure[i]->GetFigure());
-		m_List.SetItemText(Index, 4, m_GraphicalWindow.m_Figure[i]->GetCenter());
-		m_List.SetItemText(Index, 5, m_GraphicalWindow.m_Figure[i]->GetCoordinates());
+		m_List.SetItemText(Index, 4, m_GraphicalWindow.m_Figure[i]->GetStrCenter());
+		m_List.SetItemText(Index, 5, m_GraphicalWindow.m_Figure[i]->GetStrCoordinates());
 		m_List.SetItemText(Index, 6, m_GraphicalWindow.m_Figure[i]->GetAngle());
 	}
 	
 	m_List.SetItemState(m_GraphicalWindow.m_Figure.size() - m_GraphicalWindow.m_nSelectedFigure - 1,LVIS_SELECTED , LVIS_SELECTED);
 	m_List.SetSelectionMark(0);
+	if (!m_GraphicalWindow.m_Figure.empty())
+		m_dlgFigureProperties.ShowWindow(SW_SHOW);
+	else
+
+		m_dlgFigureProperties.ShowWindow(SW_HIDE);
 	m_List.SetFocus();
 	//m_List.EnsureVisible(0, FALSE);
 	/*else
@@ -456,6 +452,9 @@ void CEditorView::OnSize(UINT nType, int cx, int cy)
 	ScreenToClient(EditorViewRect);
 
 	m_List.MoveWindow(CRect(cx - 710, 400, cx - 10, cy - 10));
+	m_dlgFigureProperties.MoveWindow(CRect(cx - 710 , 10, cx - 10, 360));
+	/*if(!m_GraphicalWindow.m_Figure.empty())
+		m_dlgFigureProperties.ShowWindow(SW_SHOW);*/
 
 	m_ButDelete.MoveWindow(CRect(cx - 710, 370, cx - 610, 395));
 	m_ButNormalizeFigure.MoveWindow(CRect(cx - 600, 370, cx - 500, 395));
@@ -466,36 +465,20 @@ void CEditorView::OnSize(UINT nType, int cx, int cy)
 	m_ButRightRotate.MoveWindow(CRect(cx - 110, 370, cx - 10, 395));
 
 	m_GraphicalWindow.MoveWindow(CRect(10, 400, cx - 720, cy - 10));
+	
 
+}
 
+bool CEditorView::FigureListNotEmpty()
+{
+	return (!m_GraphicalWindow.m_Figure.empty());
 }
 
 void CEditorView::OnEditName()
 {
-	CString strName, buffer = L"";
-	m_EditName.GetWindowText(strName);
-	int i = 1;
-	if (m_GraphicalWindow.m_setNames.find(strName) != m_GraphicalWindow.m_setNames.end())
-	{
-		/*while(m_GraphicalWindow.m_setNames.find(buffer.Format(L"%s %d", strName, i)) == m_GraphicalWindow.m_setNames.end())
-		{
-			i++;
-		} */
-		do
-		{
-			buffer.Format(L"%s(%d)", strName, i);
-			i++;
-		} while (m_GraphicalWindow.m_setNames.find(buffer) != m_GraphicalWindow.m_setNames.end());
-
-		m_StaticNameWarning.ShowWindow(SW_SHOW);
-		m_GraphicalWindow.m_FigureName = buffer;
-	}
-	else
-	{
-		m_StaticNameWarning.ShowWindow(SW_HIDE);
-		m_GraphicalWindow.m_FigureName = strName;
-	}
-	
+	CString strEditText;
+	m_EditName.GetWindowText(strEditText);
+	m_GraphicalWindow.m_FigureName = SetUniqueName(strEditText);
 }
 
 void CEditorView::OnEditID()
@@ -503,10 +486,22 @@ void CEditorView::OnEditID()
 	CString strEditText;
 	m_EditID.GetWindowText(strEditText);
 	int id = _wtoi(strEditText);
+	m_GraphicalWindow.m_FigureID = SetUniqueID(id);
+}
+
+void CEditorView::OnNotify(NMHDR* pNotifyStruct, LRESULT* result)
+{
+	m_GraphicalWindow.m_nSelectedFigure = m_GraphicalWindow.m_Figure.size() - m_List.GetSelectionMark() - 1;
+	m_dlgFigureProperties.SetData();
+
+}
+
+int CEditorView::SetUniqueID(int id)
+{
 	if (m_GraphicalWindow.m_setID.find(id) != m_GraphicalWindow.m_setID.end())
 	{
 		m_StaticIDWarning.ShowWindow(SW_SHOW);
-		do 
+		do
 		{
 			id++;
 		} while (m_GraphicalWindow.m_setID.find(id) != m_GraphicalWindow.m_setID.end());
@@ -515,42 +510,164 @@ void CEditorView::OnEditID()
 	{
 		m_StaticIDWarning.ShowWindow(SW_HIDE);
 	}
-	m_GraphicalWindow.m_FigureID = id;
+	return id;
+
+
 }
 
-void CEditorView::OnNotify(NMHDR* pNotifyStruct, LRESULT* result)
+CString CEditorView::SetUniqueName(CString strEditText)
 {
-	m_GraphicalWindow.m_nSelectedFigure = m_GraphicalWindow.m_Figure.size() - m_List.GetSelectionMark() - 1;
+	CString buffer = L"";
+	int i = 1;
+	if (m_GraphicalWindow.m_setNames.find(strEditText) != m_GraphicalWindow.m_setNames.end())
+	{
+		do
+		{
+			buffer.Format(L"%s(%d)", strEditText, i);
+			i++;
+		} while (m_GraphicalWindow.m_setNames.find(buffer) != m_GraphicalWindow.m_setNames.end());
+
+		
+		m_StaticNameWarning.ShowWindow(SW_SHOW);
+		return buffer;
+	}
+	else
+	{
+		m_StaticNameWarning.ShowWindow(SW_HIDE);
+		return strEditText;
+	}
+}
+
+void CEditorView::UpdateAngle(int nAngle)
+{
+	m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetDlgAngle(nAngle);
+	//UpdateListView();
+	UpdateListView();
+	m_GraphicalWindow.OnPaint();
+	//m_dlgFigureProperties.SetFocus();
+}
+
+void CEditorView::SetColorValue(COLORREF crColor, bool bPenBrush)
+{
+	m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetDlgColorValue(crColor, bPenBrush);
+	m_GraphicalWindow.OnPaint();
 }
 
 
+void CEditorView::FillComboBox(std::vector<CString> vItems, CComboBox &cbox)
+{
+	for (int i = 0; i < vItems.size(); i++)
+	{
+		cbox.InsertString(i, vItems[i]);
+	}
+	cbox.SetCurSel(0);
+}
+
+void CEditorView::MoveFigureWithDlg(CPoint point)
+{
+	m_GraphicalWindow.MoveFigure(point);
+	//UpdateListView();
+	m_GraphicalWindow.OnPaint();
+}
+
+CString CEditorView::GetFigureType()
+{
+	if (!m_GraphicalWindow.m_Figure.empty())
+		return m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetFigure();
+	return L"Figure";
+}
+
+void CEditorView::UpdateWidth(int nWidth)
+{
+	m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetDlgWidth(nWidth);
+	m_GraphicalWindow.OnPaint();
+}
+
+void CEditorView::UpdatePenType(int nType)
+{
+	m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetDlgPenStyle(m_GraphicalWindow.PenStyles[nType]);
+	m_GraphicalWindow.OnPaint();
+}
+
+void CEditorView::UpdateBrushType(int nType)
+{
+	m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetDlgBrushStyle(m_GraphicalWindow.BrushStyles[nType]);
+	m_GraphicalWindow.OnPaint();
+}
+
+void CEditorView::UpdateName(CString strName)
+{
+	CString strOldName = m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetName();
+	if (strOldName != strName)
+	{
+		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetDlgName(SetUniqueName(strName));
+		m_GraphicalWindow.m_setNames.insert(m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetName());
+		m_GraphicalWindow.m_setNames.erase(strOldName);
+	}
+	UpdateListView();
+	m_GraphicalWindow.OnPaint();
+}
+
+void CEditorView::UpdateID(int nID)
+{
+	int strOldID = _wtoi(m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetID());
+	if (strOldID != nID)
+	{
+		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetDlgID(SetUniqueID(nID));
+		m_GraphicalWindow.m_setID.insert(_wtoi(m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetID()));
+		m_GraphicalWindow.m_setID.erase(strOldID);
+	}
+	UpdateListView();
+	m_GraphicalWindow.OnPaint();
+}
+
+void CEditorView::UpdateCoordinate(int nVertice, bool bXOrY, int nCoordinate)
+{
+	m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetDlgCoordinate(nVertice, bXOrY, nCoordinate);
+	UpdateListView();
+	m_GraphicalWindow.OnPaint();
+}
+
+void CEditorView::SetDlgData(CString& strFigure, CString& strName, int& nID, int& nAngle, int& nWidth, int& nPenStyle, int& nBrushStyle, CPoint& Center,
+	CPoint* Vertices, int* nPenColor, int* nBrushColor)
+{
+	strFigure = m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetFigure();
+	strName = m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetName();
+	nID = _wtoi(m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetID());
+	nAngle = _wtoi(m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetAngle());
+	nWidth = m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetWidth();
+	int i = 0;
+	while (m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetPenStyle() != m_GraphicalWindow.PenStyles[i])
+	{
+		i++;
+	}
+	nPenStyle = i;
+
+	i = 0;
+	while (m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetBrushStyle() != m_GraphicalWindow.BrushStyles[i])
+	{
+		i++;
+	}
+	nBrushStyle = i;
+
+	Center = m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetCenter();
+
+	//Vertices = m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetCoordinates();
+	COLORREF buf= m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetPenColor();
+	nPenColor[0] = GetRValue(buf);
+	nPenColor[1] = GetGValue(buf);
+	nPenColor[2] = GetBValue(buf);
+
+	buf = m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetBrushColor();
+	nBrushColor[0] = GetRValue(buf);
+	nBrushColor[1] = GetGValue(buf);
+	nBrushColor[2] = GetBValue(buf);
+
+	for(int i = 0; i < 4; i++)
+		Vertices[i] = (m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetCoordinates())[i];
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
@@ -661,3 +778,4 @@ void CMyListView::OnInitialUpdate()
 	listCtrl.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
 	listCtrl.SetColumnWidth(1, LVSCW_AUTOSIZE_USEHEADER);
 }
+
