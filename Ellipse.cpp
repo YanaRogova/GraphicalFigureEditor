@@ -143,3 +143,7 @@ void CEllipse::UpdateCoordinate(int nVertice)
 	NewCoordinates(m_xHalfLength, m_yHalfLength);
 }
 
+CPoint CEllipse::GetVertice(int nVertice)
+{
+	return m_vCoordinates[nVertice];
+}

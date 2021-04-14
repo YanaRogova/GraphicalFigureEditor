@@ -46,7 +46,7 @@ void CGraphicalWindow::OnPaint()
 	GetWindowRect(rect);
 	ScreenToClient(rect);
 	rect.DeflateRect(1, 1, 1, 1);
-	pDC->FillSolidRect(rect, RGB(180, 243, 254));
+	pDC->FillSolidRect(rect, RGB(255, 255, 255));
 
 	//pDC->Ellipse(20,20,300,80);
 	
@@ -153,6 +153,8 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 				m_bFigureDone = TRUE;
 			}
 			MoveFigure(point);
+			CEditorView* pView = static_cast<CEditorView*>(GetParent());
+			pView->UpdateLinks(m_nSelectedFigure);
 			UpdateList();
 			break;
 		}
@@ -247,8 +249,9 @@ BOOL CGraphicalWindow::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
 		else
 			m_Figure[m_nSelectedFigure]->Resize(false);
 		CEditorView* pView = static_cast<CEditorView*>(GetParent());
-		pView->UpdateListView();
+		pView->UpdateListView(TRUE, FALSE);
 		pView->m_dlgFigureProperties.SetData();
+		pView->UpdateLinks(m_nSelectedFigure);
 		OnPaint();
 	}
 	return 1;
@@ -259,7 +262,7 @@ void CGraphicalWindow::UpdateList()
 {
 	//CWnd* = GetParent();
 	CEditorView* pView = static_cast<CEditorView*>(GetParent());
-	pView->UpdateListView();
+	pView->UpdateListView(TRUE);
 	pView->m_dlgFigureProperties.SetData();
 }
 

@@ -262,3 +262,8 @@ void CTriangle::UpdateCoordinate(int nVertice)
 	SetCoordinates(CPoint());
 	NewCoordinates(m_xHalfLength, m_yHalfLength);
 }
+
+CPoint CTriangle::GetVertice(int nVertice)
+{
+	return m_vCoordinates[nVertice];
+}

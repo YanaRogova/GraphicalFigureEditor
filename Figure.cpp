@@ -275,6 +275,8 @@ CString CFigure::GetFigure()
 		return L"Rectangle";
 	case FIGURE_TRIANGLE:
 		return L"Triangle";
+	case FIGURE_LINK:
+		return L"Link";
 	default:
 		break;
 	}
@@ -340,4 +342,34 @@ void CFigure::SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate)
 void CFigure::UpdateCoordinate(int nVertice)
 {
 	
+}
+
+CPoint CFigure::GetVertice(int nVertice)
+{
+	return m_vCoordinates[nVertice];
+}
+
+CString CFigure::GetFirstFigure()
+{
+	return L"";
+}
+
+CString CFigure::GetSecondFigure()
+{
+	return L"";
+}
+
+void CFigure::SetFigure(CString strFigure, bool bFirstSecond)
+{
+
+}
+
+int CFigure::GetDirection()
+{
+	return -1;
+}
+
+void CFigure::SetDirection(int nDirection)
+{
+
 }

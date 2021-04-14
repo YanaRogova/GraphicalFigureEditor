@@ -25,6 +25,11 @@ void CRectangle::NewCoordinates(int xHalfLength, int yHalfLength)
 	m_vCoordinates[3] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y - yHalfLength);
 }
 
+CPoint CRectangle::GetVertice(int nVertice)
+{
+	return m_vCoordinates[nVertice];
+}
+
 void CRectangle::DrawFigure(CDC* pDC)
 {
 	/*HWND hwnd =  FindWindow(L"CGraphicalWindow", L"m_GraphicalWindow");

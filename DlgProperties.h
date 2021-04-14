@@ -1,5 +1,5 @@
 #pragma once
-
+#include <vector>
 
 // CDlgProperties dialog
 
@@ -11,6 +11,7 @@ public:
 	CDlgProperties(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CDlgProperties();
 	void SetData();
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -38,6 +39,11 @@ protected:
 	afx_msg void OnEditCoordinateY2();
 	afx_msg void OnEditCoordinateY3();
 	afx_msg void OnEditCoordinateY4();
+	afx_msg void OnCBoxDirection();
+	afx_msg void OnCBoxFirstFigure();
+	afx_msg void OnCBoxSecondFigure();
+	afx_msg void OnButSetPenColor();
+	afx_msg void OnButSetBrushColor();
 
 
 
@@ -45,20 +51,34 @@ protected:
 
 
 protected:
-
+	CFont m_Font;
 	CString m_strFigure;
 	CString m_strName;
+	CString m_strFirstFigure;
+	CString m_strSecondFigure;
 	int m_nID;
 	int m_nAngle;
 	int m_nPenColor[3];
 	int m_nBrushColor[3];
 	int m_nWidth;
-
+	int m_nDirection;
+	
 	int m_nPenStyles;
 	int m_nBrushStyles;
 	CPoint m_Center;
 	CPoint m_Vertices[4];
+	void MoveDLgItems();
 
 	CComboBox *m_ptrCBoxPenStyles;
 	CComboBox *m_ptrCBoxBrushStyles;
+	CComboBox* m_ptrCBoxLinkDirection;
+
+	std::vector<int> LinkElements;
+	std::vector<int> FigureElements;
+
+	HBRUSH hbrush;
+	HBRUSH CDlgProperties::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	//CComboBox* m_ptrCBoxLinkFirstFigure;
+	//CComboBox* m_ptrCBoxLinkSecondFigure;
+
 };

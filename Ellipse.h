@@ -16,6 +16,7 @@ public:
 	virtual void Rotate();
 	CString GetStrCoordinates();
 	CPoint* GetCoordinates();
+	CPoint GetVertice(int nVertice);
 
 	void SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate);
 	void UpdateCoordinate(int nVertice);

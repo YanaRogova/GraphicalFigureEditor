@@ -19,6 +19,7 @@ public:
 	void SetVertice(int nNumberVertice, CPoint point) override;
 	CString GetStrCoordinates();
 	CPoint* GetCoordinates();
+	CPoint GetVertice(int nVertice);
 	void SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate);
 	void UpdateCoordinate(int nVertice);
 protected:

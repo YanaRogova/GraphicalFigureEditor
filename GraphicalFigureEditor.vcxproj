@@ -76,12 +76,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <GenerateManifest>true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -190,6 +192,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="GraphicalFigureEditor.h" />
     <ClInclude Include="GraphicalWindow.h" />
+    <ClInclude Include="Link.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="NameID.h" />
     <ClInclude Include="pch.h" />
@@ -205,6 +208,7 @@
     <ClCompile Include="Figure.cpp" />
     <ClCompile Include="GraphicalFigureEditor.cpp" />
     <ClCompile Include="GraphicalWindow.cpp" />
+    <ClCompile Include="Link.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="NameID.cpp" />
     <ClCompile Include="pch.cpp">

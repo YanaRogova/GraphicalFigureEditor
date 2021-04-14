@@ -40,7 +40,7 @@ public:
 	virtual void Rotate();
 	void SetAngle(int nAngle);
 	void SetBrush();
-	void SetPen();
+	virtual void SetPen();
 	virtual int GetNumberVertices();
 	virtual void SetVertice(int nNumberVertice, CPoint point);
 	void SetDlgAngle(int nAngle);
@@ -60,12 +60,18 @@ public:
 	COLORREF GetPenColor();
 	int GetBrushStyle();
 	COLORREF GetBrushColor();
-	CString GetStrCenter();
+	virtual CString GetStrCenter();
 	CPoint GetCenter();
 	virtual CString GetStrCoordinates();
 	virtual CPoint* GetCoordinates();
-	CString GetAngle();
+	virtual CPoint GetVertice(int nVertice);
+	virtual CString GetAngle();
 	CString CFigure::GetFigure();
+	virtual CString GetFirstFigure();
+	virtual CString GetSecondFigure();
+	virtual void SetFigure(CString strFigure, bool bFirstSecond);
+	virtual int GetDirection();
+	virtual void SetDirection(int nDirection);
 
 protected:
 	//int m_nVertices;
@@ -96,6 +102,7 @@ enum FigureType
 	FIGURE_ELLIPSE = 0,
 	FIGURE_RECTANGLE,
 	FIGURE_TRIANGLE,
+	FIGURE_LINK,
 	FIGURE_MOVE
 };
 

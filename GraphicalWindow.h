@@ -6,6 +6,7 @@
 #include "Rectangle.h"
 #include "Ellipse.h"
 #include "Triangle.h"
+#include "Link.h"
 
 //class CGraphicalWindow : public CWnd
 //{
@@ -60,6 +61,9 @@ public:
 	bool m_bLButtonUp;
 	bool m_bFigureDone;
 	int m_nSelectedFigure;
+
+	int m_nLinkFirstFigure;
+	int m_nLinkSecondFigure;
 
 	std::set<CString> m_setNames;
 	std::set<int> m_setID;
