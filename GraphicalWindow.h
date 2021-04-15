@@ -8,20 +8,6 @@
 #include "Triangle.h"
 #include "Link.h"
 
-//class CGraphicalWindow : public CWnd
-//{
-//protected:
-//	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-//
-//	DECLARE_MESSAGE_MAP()
-//public:
-//	CGraphicalWindow();
-//	virtual ~CGraphicalWindow();
-//	afx_msg void OnPaint();
-//};
-
-
-
 
 class CGraphicalWindow : public CStatic
 {
@@ -69,6 +55,15 @@ public:
 	std::set<int> m_setID;
 	CString m_FigureName;
 	int m_FigureID;
+
+	
+	void SaveElement(int nNumberElement, CFile& file);
+	void CGraphicalWindow::CStringToFile(CString &string, CFile& file);
+	void CGraphicalWindow::NumberToFile(int &num, CFile& file);
+	void CGraphicalWindow::NumberToFile(unsigned long &num, CFile& file);
+	void CGraphicalWindow::SavePicture(CString strFileName);
+	void CGraphicalWindow::OpenPicture(CString strFileName);
+	bool CGraphicalWindow::CreateElement(CStdioFile& file);
 protected:
 	std::vector<CPoint> m_pRectCoordinates;
 	bool m_bPaintNow;

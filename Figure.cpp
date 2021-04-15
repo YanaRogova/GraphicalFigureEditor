@@ -8,7 +8,6 @@ CFigure::CFigure(int nFigureType, int nPenStyle, int nPenWidth, COLORREF crPenCo
 	m_figureNameID(strName, id)
 {
 	m_nFigureType = nFigureType;
-	//m_nVertices = 0;
 	m_bCanDraw = FALSE;
 	m_nPenStyle = nPenStyle;
 	m_nPenWidth = nPenWidth;
@@ -22,7 +21,7 @@ CFigure::CFigure(int nFigureType, int nPenStyle, int nPenWidth, COLORREF crPenCo
 	m_ptrBrush = nullptr;
 	SetBrush();
 	SetPen();
-	//*ptr = static_cast<CGraphicalWindow*>(GetParent());
+	m_bReturnNotRotateCoordinates = FALSE;
 }
 
 CFigure::~CFigure()
@@ -56,13 +55,6 @@ void CFigure::DrawFigure(CDC* pDC)
 	pDC->SelectObject(&brush);
 	CPen pen(m_nPenStyle, m_nPenWidth, m_crPenColor);
 	pDC->SelectObject(&pen);
-	//if(m_nAngle == 0)
-	//	pDC->Polygon(&m_vCoordinates[0], 4);
-	//else
-	//{
-	//	Rotate();
-	//	pDC->Polygon(&m_vAngleCoordinates[0], 4);
-	//}
 }
 
 int CFigure::GetFigureType()
@@ -197,6 +189,7 @@ int CFigure::GetNumberVertices()
 
 void CFigure::SetVertice(int nNumberVertice, CPoint point)
 {
+
 }
 
 CString CFigure::GetName()
@@ -333,6 +326,11 @@ void CFigure::SetDlgName(CString strName)
 void CFigure::SetDlgID(int nID)
 {
 	m_figureNameID.SetID(nID);
+}
+
+void CFigure::SetReturnCoordinates(bool bZeroAngle)
+{
+	m_bReturnNotRotateCoordinates = bZeroAngle;
 }
 
 void CFigure::SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate)

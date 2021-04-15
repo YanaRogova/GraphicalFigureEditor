@@ -50,6 +50,7 @@ public:
 	void SetDlgBrushStyle(int nStyle);
 	void SetDlgName(CString strName);
 	void SetDlgID(int nID);
+	void SetReturnCoordinates(bool bZeroAngle);
 	virtual void SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate);
 	virtual void UpdateCoordinate(int nVertice);
 
@@ -86,6 +87,8 @@ protected:
 	bool bLeftRightRotate;
 	CPen *m_ptrPen;
 	CBrush *m_ptrBrush;
+	bool m_bReturnNotRotateCoordinates;
+
 	//CGraphicalWindow *ptr;
 public:
 	CPoint m_vCoordinates[4];

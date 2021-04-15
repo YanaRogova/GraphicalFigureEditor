@@ -62,6 +62,8 @@ public:
 	afx_msg void CEditorView::OnButtonMove();
 	afx_msg void CEditorView::OnButtonDelete();
 	afx_msg void CEditorView::OnButtonTriangle();
+	afx_msg void CEditorView::SaveFile(CString strFileName);
+	afx_msg void CEditorView::OpenFile(CString strFileName);
 	afx_msg HBRUSH CEditorView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 
 	bool CEditorView::FigureListNotEmpty();

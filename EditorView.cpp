@@ -488,6 +488,16 @@ void CEditorView::OnButtonEllipse()
 	FigureOrLink(TRUE);
 }
 
+void CEditorView::SaveFile(CString strFileName)
+{
+	m_GraphicalWindow.SavePicture(strFileName);
+}
+
+void CEditorView::OpenFile(CString strFileName)
+{
+	m_GraphicalWindow.OpenPicture(strFileName);
+}
+
 void CEditorView::OnCBoxPenStyles()
 {
 	m_GraphicalWindow.m_nFigurePenStyles = m_CBoxPenStyles.GetCurSel();

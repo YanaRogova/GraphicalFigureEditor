@@ -216,7 +216,7 @@ void CTriangle::Normalize()
 CString CTriangle::GetStrCoordinates()
 {
 	CString str;
-	if (m_nAngle == 0)
+	if (m_nAngle == 0 || m_bReturnNotRotateCoordinates)
 		str.Format(L"{(%d, %d), (%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x,
 			m_vCoordinates[1].y, m_vCoordinates[2].x, m_vCoordinates[2].y);
 	else

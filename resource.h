@@ -68,8 +68,6 @@
 #define IDC_STATIC_P_G                  1070
 #define IDC_STATIC_P_B                  1071
 #define IDC_COMBO_DIRECTION             1072
-#define IDC_COMBO_FIRST_FIGURE          1073
-#define IDC_COMBO_SECOND_FIGURE         1074
 #define IDC_STATIC_DIRECTION	        1075
 #define IDC_STATIC_FIGURE1		        1076
 #define IDC_STATIC_FIGURE2		        1077

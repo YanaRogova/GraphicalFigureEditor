@@ -58,8 +58,8 @@ void CRectangle::Rotate()
 
 	for (int i = 0; i < m_nVertices; i++)
 	{
-		m_vAngleCoordinates[i] = CPoint(m_CenterCoordinates.x - m_vAngleCoordinates[i].x,
-			m_CenterCoordinates.y - m_vAngleCoordinates[i].y);
+		m_vAngleCoordinates[i] = CPoint(m_CenterCoordinates.x + m_vAngleCoordinates[i].x,
+			m_CenterCoordinates.y + m_vAngleCoordinates[i].y);
 	}
 }
 
@@ -74,7 +74,7 @@ void CRectangle::SetCoordinates(CPoint point)
 CString CRectangle::GetStrCoordinates()
 {
 	CString str;
-	if(m_nAngle == 0)
+	if(m_nAngle == 0 || m_bReturnNotRotateCoordinates)
 		str.Format(L"{(%d, %d), (%d, %d), (%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x, 
 		m_vCoordinates[1].y, m_vCoordinates[2].x, m_vCoordinates[2].y, m_vCoordinates[3].x, m_vCoordinates[3].y);
 	else
@@ -156,10 +156,7 @@ void CRectangle::SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate)
 void CRectangle::UpdateCoordinate(int nVertice)
 {
 	m_nAngle *= -1;
-	/*m_vCoordinates[nVertice] = RotatePoint(-(m_CenterCoordinates.x - m_vAngleCoordinates[nVertice].x),
-		-(m_CenterCoordinates.y - m_vAngleCoordinates[nVertice].y));
-	m_vCoordinates[nVertice] = CPoint(m_CenterCoordinates.x + m_vCoordinates[nVertice].x,
-		m_CenterCoordinates.y + m_vCoordinates[nVertice].y);*/
+	
 	m_vCoordinates[nVertice] = RotatePoint(-m_CenterCoordinates.x + m_vCoordinates[nVertice].x,
 		-m_CenterCoordinates.y + m_vAngleCoordinates[nVertice].y);
 	m_vCoordinates[nVertice] = CPoint(m_CenterCoordinates.x + m_vCoordinates[nVertice].x,

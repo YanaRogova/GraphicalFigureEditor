@@ -19,6 +19,8 @@ IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
 	ON_WM_SETFOCUS()
+	ON_COMMAND(ID_FILE_SAVE, OnFileSaveAs)
+	ON_COMMAND(ID_FILE_OPEN, OnFileOpen)
 END_MESSAGE_MAP()
 
 // CMainFrame construction/destruction
@@ -102,3 +104,22 @@ BOOL CMainFrame::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO*
 }
 
 
+void CMainFrame::OnFileSaveAs()
+{
+	CFileDialog dlgSaveAs(FALSE, L"gde", L"New picture", OFN_OVERWRITEPROMPT | OFN_NOVALIDATE,
+		L"Graghical figure editor (*.gde)|*.gde|");
+	int result = dlgSaveAs.DoModal();
+	
+	CString strFileName = dlgSaveAs.GetPathName();
+	m_wndView.SaveFile(strFileName);
+}
+
+void CMainFrame::OnFileOpen()
+{
+	CFileDialog dlgOpen(TRUE, L"gde", NULL, OFN_OVERWRITEPROMPT | OFN_NOVALIDATE,
+		L"Graghical figure editor (*.gde)|*.gde|");
+	int result = dlgOpen.DoModal();
+
+	CString strFileName = dlgOpen.GetPathName();
+	m_wndView.OpenFile(strFileName);
+}
