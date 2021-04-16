@@ -2,7 +2,6 @@
 #include "GraphicalWindow.h"
 #include "EditorView.h"
 #include <string>
-#define ID_TIMER	2000
 
 
 BEGIN_MESSAGE_MAP(CGraphicalWindow, CStatic)
@@ -10,6 +9,9 @@ BEGIN_MESSAGE_MAP(CGraphicalWindow, CStatic)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEWHEEL()
+	/*ON_WM_VSCROLL()
+	ON_WM_HSCROLL()
+	ON_WM_SETCURSOR()*/
 END_MESSAGE_MAP()
 
 CGraphicalWindow::CGraphicalWindow()
@@ -27,29 +29,28 @@ CGraphicalWindow::CGraphicalWindow()
 	m_nFigureBrushStyles = 0;
 	m_bFigureDone = TRUE;
 	m_nSelectedFigure = -1;
+	m_bPictureNotSaved = FALSE;
 }
 
 CGraphicalWindow::~CGraphicalWindow()
 {
 }
 
+//void CGraphicalWindow::OnDraw(CDC* pDC)
+//{}
+
 void CGraphicalWindow::OnPaint()
 {
-	CWnd::OnPaint(); //for work with CColorDialog
+	CWnd::OnPaint();
 	CDC* pDCPaint = GetDC();
 	CMemDC memDC(*pDCPaint, this);
 	CDC* pDC = &memDC.GetDC();
-	//CDC* pDC = GetDC();
 	
 	CRect rect;
 	GetWindowRect(rect);
 	ScreenToClient(rect);
 	rect.DeflateRect(1, 1, 1, 1);
 	pDC->FillSolidRect(rect, RGB(255, 255, 255));
-
-	//pDC->Ellipse(20,20,300,80);
-	
-	//delete[] pointArray;
 	
 	for (int i = 0; i < m_Figure.size(); i++)
 	{
@@ -57,12 +58,16 @@ void CGraphicalWindow::OnPaint()
 		{
 			m_Figure[i]->DrawFigure(pDC);
 		}
-		
 	}
-	//m_bLButtonDown = FALSE;
-	//m_bLButtonUp = FALSE;
 }
 
+void CGraphicalWindow::PreCreateFigure()
+{
+	SetFigureNameAndID();
+	m_setNames.insert(m_FigureName);
+	m_setID.insert(m_FigureID);
+	m_bPictureNotSaved = TRUE;
+}
 
 void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -74,18 +79,14 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 			switch (m_nFigureType)
 			{
 			case FIGURE_ELLIPSE:
-				SetFigureNameAndID();
-				m_setNames.insert(m_FigureName);
-				m_setID.insert(m_FigureID);
+				PreCreateFigure();
 				m_Figure.push_back(new CEllipse(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
 					BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
 				m_bFigureDone = FALSE;
 				break;
 
 			case FIGURE_RECTANGLE:
-				SetFigureNameAndID();
-				m_setNames.insert(m_FigureName);
-				m_setID.insert(m_FigureID);
+				PreCreateFigure();
 				m_Figure.push_back(new CRectangle(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
 					BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
 				m_bFigureDone = FALSE;
@@ -94,9 +95,7 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 			case FIGURE_TRIANGLE:
 				if (m_Figure.empty())
 				{
-					SetFigureNameAndID();
-					m_setNames.insert(m_FigureName);
-					m_setID.insert(m_FigureID);
+					PreCreateFigure();
 					m_Figure.push_back(new CTriangle(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
 						BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
 				}
@@ -106,9 +105,7 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 					nNumberVertice = m_Figure[m_Figure.size() - 1]->GetNumberVertices();
 					if (nNumberVertice == 3 || nNumberVertice == -1)
 					{
-						SetFigureNameAndID();
-						m_setNames.insert(m_FigureName);
-						m_setID.insert(m_FigureID);
+						PreCreateFigure();
 						m_Figure.push_back(new CTriangle(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
 							BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
 
@@ -122,14 +119,9 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 		
 		m_bPaintNow = FALSE;
-		//if(!m_Figure.empty())
 		switch (m_nFigureType) 
 		{
 		case FIGURE_ELLIPSE:
-			/*m_Figure[m_Figure.size() - 1]->m_vCoordinates[0] = point;
-			m_bFigureDone = TRUE;
-			break;*/
-
 		case FIGURE_RECTANGLE:
 			m_Figure[m_Figure.size() - 1]->m_vCoordinates[0] = point;
 			m_bFigureDone = TRUE;
@@ -176,7 +168,6 @@ void CGraphicalWindow::OnLButtonUp(UINT nFlags, CPoint point)
 			{
 				m_nSelectedFigure = m_Figure.size() - 1;
 				m_Figure[m_nSelectedFigure]->SetCoordinates(point);
-				//SetFigureNameAndID();
 			}
 			else
 			{
@@ -286,8 +277,6 @@ void CGraphicalWindow::SaveElement(int nNumberElement, CFile &file)
 		if (strFigure == FIGURE_RECTANGLE || strFigure == FIGURE_ELLIPSE)
 			nEndIndex = strNewString.find("(", nEndIndex) + 1;
 	}	
-	//string = "";
-	//CStringToFile(string, file);
 }
 
 void CGraphicalWindow::SavePicture(CString strFileName)
@@ -299,6 +288,7 @@ void CGraphicalWindow::SavePicture(CString strFileName)
 		SaveElement(i, FilePicture);
 	}
 	FilePicture.Close();
+	m_bPictureNotSaved = FALSE;
 }
 
 bool CGraphicalWindow::CreateElement(CStdioFile& file)
@@ -461,5 +451,78 @@ void CGraphicalWindow::MoveFigure(CPoint point)
 		m_Figure[m_nSelectedFigure]->Move(point);
 		CEditorView* pView = static_cast<CEditorView*>(GetParent());
 		pView->m_dlgFigureProperties.SetData();
+		m_bPictureNotSaved = TRUE;
 	}
 }
+
+bool CGraphicalWindow::PictureNotSaved()
+{
+	return m_bPictureNotSaved;
+}
+
+void CGraphicalWindow::SetPictureNotSaved(bool bNotSaved)
+{
+	m_bPictureNotSaved = bNotSaved;
+}
+
+
+void CGraphicalWindow::DeleteFigure()
+{
+	m_setID.erase(_wtoi(m_Figure[m_nSelectedFigure]->GetID()));
+	m_setNames.erase(m_Figure[m_nSelectedFigure]->GetName());
+	for (int i = 0; i < m_Figure.size(); i++)
+	{
+		if (m_Figure[i]->GetFigureType() == FIGURE_LINK)
+			if (m_Figure[i]->GetFirstFigure() == m_Figure[m_nSelectedFigure]->GetName() ||
+				m_Figure[i]->GetSecondFigure() == m_Figure[m_nSelectedFigure]->GetName())
+			{
+				m_setID.erase(_wtoi(m_Figure[i]->GetID()));
+				m_setNames.erase(m_Figure[i]->GetName());
+				m_Figure.erase(m_Figure.begin() + i);
+				i--;
+			}
+	}
+	m_Figure.erase(m_Figure.begin() + m_nSelectedFigure);
+
+	m_nSelectedFigure = 0;
+
+	m_bPictureNotSaved = TRUE;
+}
+
+//
+//void CGraphicalWindow::CreateVerticalScrollbar(int nStartX, int nStartY, int m_nWidth, int m_nHeight)
+//{
+//	ModifyStyle(NULL, WS_VSCROLL | WS_HSCROLL);
+//	SetScrollRange(SB_VERT, nStartY, nStartY + m_nHeight, TRUE);
+//	SetScrollRange(SB_HORZ, nStartX, nStartX + m_nWidth, TRUE);
+//	pos = nStartY;
+//	/*SetScrollPos(SB_VERT, nStartY);
+//	SetScrollPos(SB_HORZ, nStartX);*/
+//	//SetScrollInfo(SB_VERT, )
+//}
+//
+//void CGraphicalWindow::CreateHorizontalScrollbar(int m_nWidth, int m_nHeight)
+//{
+//	ModifyStyle(NULL, WS_VSCROLL | WS_HSCROLL);
+//	SetScrollRange(SB_VERT, 0, m_nHeight, TRUE);
+//	SetScrollRange(SB_HORZ, 0, m_nWidth, TRUE);
+//}
+//
+//void CGraphicalWindow::OnVScroll(UINT SBCode, UINT Pos, CScrollBar* SB)
+//{
+//	//CWnd::OnVScroll(SBCode, Pos, SB);
+//	SB->SetScrollPos(SB_VERT, 40);
+//	pos = Pos;
+//}
+//
+//
+//void CGraphicalWindow::OnHScroll(UINT SBCode, UINT Pos, CScrollBar* SB)
+//{
+//	//CWnd::OnHScroll(SBCode, Pos, SB);
+//}
+//
+//BOOL CGraphicalWindow::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+//{
+//	SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW)); // установить курсор, который взять из системы
+//	return TRUE;
+//}

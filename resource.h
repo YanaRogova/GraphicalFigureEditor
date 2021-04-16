@@ -2,8 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by GraphicalFigureEditor.rc
 //
-
-
 #define IDD_ABOUTBOX                    100
 #define IDR_MAINFRAME                   128
 #define IDS_BUT_RECTANGLE               129
@@ -68,16 +66,19 @@
 #define IDC_STATIC_P_G                  1070
 #define IDC_STATIC_P_B                  1071
 #define IDC_COMBO_DIRECTION             1072
-#define IDC_STATIC_DIRECTION	        1075
-#define IDC_STATIC_FIGURE1		        1076
-#define IDC_STATIC_FIGURE2		        1077
+#define IDC_STATIC_DIRECTION            1075
+#define IDC_STATIC_FIGURE1              1076
+#define IDC_STATIC_FIGURE2              1077
+#define ID_PICTURE_RESIZE               32774
+#define ID_PICTURE_RESIZE32775          32775
+#define ID_PICTURE_CLEAR                32776
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        314
-#define _APS_NEXT_COMMAND_VALUE         32774
+#define _APS_NEXT_COMMAND_VALUE         32777
 #define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

@@ -21,6 +21,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_SETFOCUS()
 	ON_COMMAND(ID_FILE_SAVE, OnFileSaveAs)
 	ON_COMMAND(ID_FILE_OPEN, OnFileOpen)
+	ON_COMMAND(ID_FILE_NEW, OnNew)
+	ON_COMMAND(ID_PICTURE_RESIZE, OnResize)
 END_MESSAGE_MAP()
 
 // CMainFrame construction/destruction
@@ -41,11 +43,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// create a view to occupy the client area of the frame
 	if (!m_wndView.Create(nullptr, nullptr, AFX_WS_DEFAULT_VIEW,
-		CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST, nullptr))
+		CRect(), this, AFX_IDW_PANE_FIRST, nullptr))
 	{
 		TRACE0("Failed to create view window\n");
 		return -1;
 	}
+	/*CRect EditorViewRect;
+	GetWindowRect(EditorViewRect);
+	ScreenToClient(EditorViewRect);
+	m_wndView.NewFile();*/
 	return 0;
 }
 
@@ -61,7 +67,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	cs.cx = nxSize;
 	cs.cy = nySize;
 	
-	cs.style = WS_OVERLAPPED | WS_CAPTION | FWS_ADDTOTITLE | WS_MAXIMIZE
+	cs.style = WS_OVERLAPPED | WS_CAPTION | FWS_ADDTOTITLE 
 		 | WS_SYSMENU | WS_OVERLAPPEDWINDOW;
 
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
@@ -106,20 +112,63 @@ BOOL CMainFrame::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO*
 
 void CMainFrame::OnFileSaveAs()
 {
-	CFileDialog dlgSaveAs(FALSE, L"gde", L"New picture", OFN_OVERWRITEPROMPT | OFN_NOVALIDATE,
-		L"Graghical figure editor (*.gde)|*.gde|");
+	CFileDialog dlgSaveAs(FALSE, L"gfe", L"New picture", OFN_OVERWRITEPROMPT | OFN_NOVALIDATE,
+		L"Graghical figure editor (*.gfe)|*.gfe|");
 	int result = dlgSaveAs.DoModal();
-	
-	CString strFileName = dlgSaveAs.GetPathName();
-	m_wndView.SaveFile(strFileName);
+	if (result == IDOK)
+	{
+		CString strFileName = dlgSaveAs.GetPathName();
+		m_wndView.SaveFile(strFileName);
+	}
 }
 
 void CMainFrame::OnFileOpen()
 {
-	CFileDialog dlgOpen(TRUE, L"gde", NULL, OFN_OVERWRITEPROMPT | OFN_NOVALIDATE,
-		L"Graghical figure editor (*.gde)|*.gde|");
-	int result = dlgOpen.DoModal();
-
-	CString strFileName = dlgOpen.GetPathName();
-	m_wndView.OpenFile(strFileName);
+	int result;
+	if (m_wndView.PictureNotSaved())
+	{
+		result = AfxMessageBox(L"Do you want to save changes to the current file?", MB_YESNO);
+		if (result == IDYES)
+		{
+			OnFileSaveAs();
+		}
+	}
+	m_wndView.NewFile();
+	CFileDialog dlgOpen(TRUE, L"gfe", NULL, OFN_OVERWRITEPROMPT | OFN_NOVALIDATE,
+		L"Graghical figure editor (*.gfe)|*.gfe|");
+	result = dlgOpen.DoModal();
+	if (result == IDOK)
+	{
+		CString strFileName = dlgOpen.GetPathName();
+		m_wndView.OpenFile(strFileName);
+	}
 }
+
+void CMainFrame::OnNew()
+{
+	int result;
+	if (m_wndView.PictureNotSaved())
+	{
+		result = AfxMessageBox(L"Do you want to save changes to the current file?", MB_YESNO);
+		if (result == IDYES)
+		{
+			OnFileSaveAs();
+		}
+	}
+	
+	m_wndView.NewFile();
+}
+
+void CMainFrame::OnResize()
+{
+	int result;
+	if (m_wndView.PictureNotSaved())
+	{
+		result = AfxMessageBox(L"Do you want to save changes to the current file?", MB_YESNO);
+		if (result == IDYES)
+		{
+			OnFileSaveAs();
+		}
+	}
+}
+

@@ -40,6 +40,8 @@ protected:
 	afx_msg void OnSetFocus(CWnd *pOldWnd);
 	afx_msg void OnFileSaveAs();
 	afx_msg void OnFileOpen();
+	afx_msg void OnNew();
+	afx_msg void OnResize();
 	DECLARE_MESSAGE_MAP()
 
 };

@@ -9,30 +9,33 @@
 #include "Link.h"
 
 
-class CGraphicalWindow : public CStatic
+class CGraphicalWindow : public CStatic//View
 {
 public:
-
+	//virtual void OnDraw(CDC* pDC);
 	CGraphicalWindow();
-	afx_msg void CGraphicalWindow::OnPaint();
-	virtual CGraphicalWindow::~CGraphicalWindow();
+	afx_msg void OnPaint();
+	virtual ~CGraphicalWindow();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg void OnTimer(UINT_PTR time);
-	afx_msg BOOL CGraphicalWindow::OnEraseBkgnd(CDC* pDC);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-	void CGraphicalWindow::SetFigureType(int nFigureType);
-	void CGraphicalWindow::UpdateList();
-	void CGraphicalWindow::SetFigureNameAndID();
+	/*afx_msg void OnVScroll(UINT SBCode, UINT Pos, CScrollBar* SB);
+	afx_msg void OnHScroll(UINT SBCode, UINT Pos, CScrollBar* SB);
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);*/
+	void SetFigureType(int nFigureType);
+	void UpdateList();
+	void SetFigureNameAndID();
 
-	void CGraphicalWindow::MoveFigure(CPoint point);
+	void MoveFigure(CPoint point);
+	bool PictureNotSaved();
+	void SetPictureNotSaved(bool bNotSaved);
+	void DeleteFigure();
+	/*void CreateVerticalScrollbar(int nStartX, int nStartY, int m_nWidth, int m_nHeight);
+	void CreateHorizontalScrollbar(int m_nWidth, int m_nHeight);*/
 protected:
 
-	DECLARE_MESSAGE_MAP()
-	//void CGraphicalWindow::GetCoordinates(CPoint point);
-	//void CGraphicalWindow::DrawRectangle();
-	
+	DECLARE_MESSAGE_MAP()	
 	
 public: 
 	std::vector<int> PenStyles;
@@ -58,19 +61,21 @@ public:
 
 	
 	void SaveElement(int nNumberElement, CFile& file);
-	void CGraphicalWindow::CStringToFile(CString &string, CFile& file);
-	void CGraphicalWindow::NumberToFile(int &num, CFile& file);
-	void CGraphicalWindow::NumberToFile(unsigned long &num, CFile& file);
-	void CGraphicalWindow::SavePicture(CString strFileName);
-	void CGraphicalWindow::OpenPicture(CString strFileName);
-	bool CGraphicalWindow::CreateElement(CStdioFile& file);
+	void CStringToFile(CString &string, CFile& file);
+	void NumberToFile(int &num, CFile& file);
+	void NumberToFile(unsigned long &num, CFile& file);
+	void SavePicture(CString strFileName);
+	void OpenPicture(CString strFileName);
+	bool CreateElement(CStdioFile& file);
 protected:
 	std::vector<CPoint> m_pRectCoordinates;
 	bool m_bPaintNow;
 	bool m_bLButtonDown;
 	int m_nFigureType;
+	bool m_bPictureNotSaved;
 
-	
-		
+	void CGraphicalWindow::PreCreateFigure();
+	//int pos = 0;
+	//int pos1 = 0;
 };
 

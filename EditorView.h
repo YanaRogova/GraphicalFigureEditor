@@ -8,18 +8,6 @@
 #include "GraphicalWindow.h"
 #include "DlgProperties.h"
 
-// CChildView window
-class CMyListView : public CListView
-{
-public:
-	CMyListView();
-	virtual ~CMyListView();
-	void OnInitialUpdate() override;
-};
-
-
-
-
 
 class CEditorView : public CWnd
 {
@@ -64,6 +52,7 @@ public:
 	afx_msg void CEditorView::OnButtonTriangle();
 	afx_msg void CEditorView::SaveFile(CString strFileName);
 	afx_msg void CEditorView::OpenFile(CString strFileName);
+	afx_msg void CEditorView::NewFile();
 	afx_msg HBRUSH CEditorView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 
 	bool CEditorView::FigureListNotEmpty();
@@ -97,6 +86,7 @@ public:
 	void CEditorView::UpdateAngle(int nAngle);
 	void CEditorView::SetColorValue(COLORREF crColor, bool bPenBrush);
 	CString CEditorView::GetFigureType();
+	bool CEditorView::PictureNotSaved();
 
 
 
@@ -145,6 +135,9 @@ protected:
 
 
 	CBrush m_brBackground;
+	int m_nHeight;
+	int m_nWidth;
+	bool bNewGraphicalWindow;
 	//CMyListView m_List;
 	//CListView m;
 };

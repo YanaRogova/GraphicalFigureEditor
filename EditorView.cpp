@@ -48,6 +48,9 @@ CEditorView::CEditorView()
 	BrushStylesNames = { L"Solid", L"Null", L"Vertical hatch", L"Horizontal hatch", L"Horizontal and vertical crosshatch",
 		L"Downward hatch at 45 degrees", L"Upward hatch at 45 degrees", L"Crosshatch at 45 degrees" };
 	LinkDirection = { L"None", L"To first", L"To second", L"To first and second" };
+	m_nHeight = 0;
+	m_nWidth = 0;
+	bNewGraphicalWindow = FALSE;
 }
 
 CEditorView::~CEditorView()
@@ -179,9 +182,13 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH | FF_DONTCARE, L"Georgia");
 
 
-	m_GraphicalWindow.Create(L"", WS_VISIBLE | WS_CHILD  | WS_BORDER | SS_NOTIFY /*| WS_VSCROLL | WS_HSCROLL | WS_SIZEBOX*/,
+	m_GraphicalWindow.Create(L"", WS_VISIBLE | WS_CHILD  | WS_BORDER | SS_NOTIFY,
 		CRect(), this, ID_OUTPUT_WINDOW);
-
+	/*m_GraphicalWindow.Create(L"", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_NOTIFY,
+		CRect(), this, ID_OUTPUT_WINDOW);*/
+	/*m_GraphicalWindow.Create(WS_VISIBLE | WS_CHILD | WS_BORDER | SS_NOTIFY,
+		CRect(), this, ID_OUTPUT_WINDOW);*/
+	//m_GraphicalWindow.ModifyStyle();
 	m_dlgFigureProperties.Create(IDD_DLG_PROPERTIES, this);
 	m_dlgFigureProperties.ShowWindow(SW_HIDE);
 	//m_dlgFigureProperties.ShowWindow(SW_SHOW);
@@ -229,7 +236,7 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_StaticID.Create(L"ID:", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
 		CRect(x, y, x+25, y + 25), this, ID_STATIC);
 	m_StaticID.SetFont(&m_Font);
-	x += 30;
+	x += 26;
 	m_EditID.Create(WS_VISIBLE | WS_CHILD | ES_NUMBER | WS_BORDER,
 		CRect(x, y, x+100, y+ 25), this, ID_ED_ID);
 	m_EditID.SetFont(&m_Font);
@@ -498,6 +505,36 @@ void CEditorView::OpenFile(CString strFileName)
 	m_GraphicalWindow.OpenPicture(strFileName);
 }
 
+void CEditorView::NewFile()
+{
+	m_GraphicalWindow.m_setID.clear();
+	m_GraphicalWindow.m_setNames.clear();
+	m_GraphicalWindow.m_Figure.clear();
+	UpdateListView(TRUE);
+	CRect EditorViewRect;
+	GetClientRect(EditorViewRect);
+	//ScreenToClient(EditorViewRect);
+	m_nWidth = EditorViewRect.Width() - 730;
+	m_nHeight = EditorViewRect.Height() - 207;
+	int nCenterX = (EditorViewRect.Width() - 720 + 10) / 2;
+	int nCenterY = (EditorViewRect.Height() - 10 + 197) / 2;
+
+	bNewGraphicalWindow = FALSE;
+	CPoint SecondCoordinate;
+	if (m_nWidth % 2 == 1)
+		SecondCoordinate.x = nCenterX + (m_nWidth / 2 + 1);
+	else
+		SecondCoordinate.x = nCenterX + m_nWidth / 2;
+
+	if (m_nHeight % 2 == 1)
+		SecondCoordinate.y = nCenterY + (m_nHeight / 2 + 1);
+	else
+		SecondCoordinate.y = nCenterY + m_nHeight / 2;
+
+	m_GraphicalWindow.MoveWindow(CRect(nCenterX - m_nWidth / 2, nCenterY - m_nHeight / 2, SecondCoordinate.x, SecondCoordinate.y));
+	Invalidate();
+}
+
 void CEditorView::OnCBoxPenStyles()
 {
 	m_GraphicalWindow.m_nFigurePenStyles = m_CBoxPenStyles.GetCurSel();
@@ -561,6 +598,7 @@ void CEditorView::OnButtonNormalizeFigure()
 	{
 		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->Normalize();
 		UpdateLinks(m_GraphicalWindow.m_nSelectedFigure);
+		m_GraphicalWindow.SetPictureNotSaved(TRUE);
 		m_GraphicalWindow.OnPaint();
 		UpdateListView(TRUE, FALSE);
 		m_dlgFigureProperties.SetData();
@@ -585,6 +623,7 @@ void CEditorView::OnButtonLeftRotate()
 	{
 		m_EditFigureAngle.GetWindowText(strEditText);
 		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetAngle(_wtoi(strEditText));
+		m_GraphicalWindow.SetPictureNotSaved(TRUE);
 		UpdateLinks(m_GraphicalWindow.m_nSelectedFigure);
 		m_GraphicalWindow.OnPaint();
 		UpdateListView(TRUE, FALSE);
@@ -599,6 +638,7 @@ void CEditorView::OnButtonRightRotate()
 	{
 		m_EditFigureAngle.GetWindowText(strEditText);
 		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetAngle(-_wtoi(strEditText));
+		m_GraphicalWindow.SetPictureNotSaved(TRUE);
 		UpdateLinks(m_GraphicalWindow.m_nSelectedFigure);
 		m_GraphicalWindow.OnPaint();
 		UpdateListView(TRUE, FALSE); 
@@ -622,35 +662,9 @@ void CEditorView::OnButtonDelete()
 {
 	if (!m_GraphicalWindow.m_Figure.empty())
 	{
-		m_GraphicalWindow.m_setID.erase(_wtoi(m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetID()));
-		m_GraphicalWindow.m_setNames.erase(m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetName());
-		for (int i = 0; i < m_GraphicalWindow.m_Figure.size(); i++)
-		{
-			if(m_GraphicalWindow.m_Figure[i]->GetFigureType() == FIGURE_LINK)
-				if (m_GraphicalWindow.m_Figure[i]->GetFirstFigure() == m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetName() ||
-					m_GraphicalWindow.m_Figure[i]->GetSecondFigure() == m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->GetName())
-				{
-					m_GraphicalWindow.m_setID.erase(_wtoi(m_GraphicalWindow.m_Figure[i]->GetID()));
-					m_GraphicalWindow.m_setNames.erase(m_GraphicalWindow.m_Figure[i]->GetName());
-					m_GraphicalWindow.m_Figure.erase(m_GraphicalWindow.m_Figure.begin() + i);
-					i--;
-				}
-		}
-		m_GraphicalWindow.m_Figure.erase(m_GraphicalWindow.m_Figure.begin() + m_GraphicalWindow.m_nSelectedFigure);
-		/*for (int figures = m_GraphicalWindow.m_nSelectedFigure; figures < m_GraphicalWindow.m_Figure.size(); figures++)
-		{
-			for(int links = m_GraphicalWindow.m_nSelectedFigure; links < m_GraphicalWindow.m_Figure.size(); links++)
-			if (m_GraphicalWindow.m_Figure[links]->GetFigureType() == FIGURE_LINK)
-			{
-				if (m_GraphicalWindow.m_Figure[links]->GetFirstFigure() == (figures + 1))
-					m_GraphicalWindow.m_Figure[links]->SetFigure(figures, TRUE);
-				if (m_GraphicalWindow.m_Figure[links]->GetSecondFigure() == (figures + 1))
-					m_GraphicalWindow.m_Figure[links]->SetFigure(figures, FALSE);
-			}
-			
-			UpdateLinks(figures);
-		}*/
-		m_GraphicalWindow.m_nSelectedFigure = 0;
+		
+		m_GraphicalWindow.DeleteFigure();
+		
 		UpdateLinks(m_GraphicalWindow.m_nSelectedFigure);
 		UpdateListView(TRUE);
 		m_dlgFigureProperties.SetData();
@@ -727,10 +741,6 @@ void CEditorView::MoveFigureElement(int nCurrentPosition, int nNewPosition)
 
 void CEditorView::OnSize(UINT nType, int cx, int cy)
 {
-	CRect EditorViewRect;
-	GetWindowRect(EditorViewRect);
-	ScreenToClient(EditorViewRect);
-
 	m_List.MoveWindow(CRect(cx - 710, 400, cx - 10, cy - 10));
 	m_dlgFigureProperties.MoveWindow(CRect(cx - 710 , 10, cx - 10, 360));
 	/*if(!m_GraphicalWindow.m_Figure.empty())
@@ -740,13 +750,54 @@ void CEditorView::OnSize(UINT nType, int cx, int cy)
 	m_ButNormalizeFigure.MoveWindow(CRect(cx - 600, 370, cx - 500, 395));
 	m_ButMove.MoveWindow(CRect(cx - 490, 370, cx - 390, 395));
 	m_StaticAngle.MoveWindow(CRect(cx - 380, 370, cx - 280, 395));
-	m_EditFigureAngle.MoveWindow(CRect(cx - 270, 370, cx - 230, 395));
+	m_EditFigureAngle.MoveWindow(CRect(cx - 276, 370, cx - 230, 395));
 	m_ButLeftRotate.MoveWindow(CRect(cx - 220, 370, cx - 120, 395));
 	m_ButRightRotate.MoveWindow(CRect(cx - 110, 370, cx - 10, 395));
 
-	m_GraphicalWindow.MoveWindow(CRect(10, 197, cx - 720, cy - 10));
-	
+	int nCenterX = (cx - 720 + 10) / 2;
+	int nCenterY = (cy - 10 + 197) / 2;
 
+	
+	CPoint Coordinate[2];
+	if (m_nWidth % 2 == 1)
+		Coordinate[1].x = nCenterX + (m_nWidth / 2 + 1);
+	else
+		Coordinate[1].x = nCenterX + m_nWidth / 2;
+
+	if (m_nHeight % 2 == 1)
+		Coordinate[1].y = nCenterY + (m_nHeight / 2 + 1);
+	else
+		Coordinate[1].y = nCenterY + m_nHeight / 2;
+
+	if (m_nHeight > cy - 207)
+	{
+		
+		Coordinate[0].y = 197;
+		Coordinate[1].y = cy - 10;
+		/*m_GraphicalWindow.CreateVerticalScrollbar(Coordinate[1].x - Coordinate[0].x, Coordinate[1].y - Coordinate[0].y,
+			m_nWidth - Coordinate[1].x, m_nHeight - Coordinate[1].y);*/
+
+	}
+	else
+	{
+		m_GraphicalWindow.ModifyStyle(WS_VSCROLL | WS_HSCROLL, NULL);
+		Coordinate[0].y = nCenterY - m_nHeight / 2;
+	}
+
+	if (m_nWidth > cx - 720)
+	{
+		Coordinate[0].x = 10;
+		Coordinate[1].x = cx - 720;
+		/*m_GraphicalWindow.CreateHorizontalScrollbar(Coordinate[1].x - Coordinate[0].x, Coordinate[1].y - Coordinate[0].y,
+			m_nWidth - Coordinate[1].x, m_nHeight - Coordinate[1].y);*/
+	}
+	else
+	{
+		//m_GraphicalWindow.ModifyStyle(WS_VSCROLL | WS_HSCROLL, NULL);
+		Coordinate[0].x = nCenterX - m_nWidth / 2;
+	}
+	
+	m_GraphicalWindow.MoveWindow(CRect(Coordinate[0].x, Coordinate[0].y, Coordinate[1].x, Coordinate[1].y));
 }
 
 bool CEditorView::FigureListNotEmpty()
@@ -845,7 +896,6 @@ void CEditorView::FillComboBox(std::vector<CString> vItems, CComboBox &cbox)
 
 void CEditorView::FillLinkComboBox(std::vector<CFigure*>& vItems, CComboBox& cbox, bool bFirstSecond, int nFirstSelected)
 {
-	
 	cbox.ResetContent();
 	
 	int counter = 0;
@@ -1081,11 +1131,14 @@ void CEditorView::UpdateDirection(int nDirection)
 	m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetDirection(nDirection);
 	m_GraphicalWindow.OnPaint();
 }
+bool CEditorView::PictureNotSaved()
+{
+	return m_GraphicalWindow.PictureNotSaved();
+}
 
 void CEditorView::UpdateLinkFigures(CString strName, bool bFirstSecond)
 {
 	int nCurSel = 0;
-
 	for (int i = 0; i < m_GraphicalWindow.m_Figure.size(); i++)
 	{
 		if (m_GraphicalWindow.m_Figure[i]->GetName() == strName)
@@ -1096,7 +1149,6 @@ void CEditorView::UpdateLinkFigures(CString strName, bool bFirstSecond)
 	}
 	if (bFirstSecond)
 	{
-		
 		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetFigure(strName, TRUE);
 		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->
 			SetVertice(0, m_GraphicalWindow.m_Figure[nCurSel]->GetCenter());
@@ -1107,110 +1159,5 @@ void CEditorView::UpdateLinkFigures(CString strName, bool bFirstSecond)
 		m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->
 			SetVertice(1, m_GraphicalWindow.m_Figure[nCurSel]->GetCenter());
 	}
-
-	/*m_GraphicalWindow.m_Figure[m_GraphicalWindow.m_nSelectedFigure]->SetVertice(0, 
-		m_GraphicalWindow.m_Figure[nCurSel]->GetCenter());*/
-
 	m_GraphicalWindow.OnPaint();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-CMyListView::CMyListView() {
-
-}
-
-CMyListView::~CMyListView() {
-
-}
-
-void CMyListView::OnInitialUpdate()
-{
-	CListView::OnInitialUpdate();
-
-	// this code only works for a report-mode list view
-	//ASSERT(GetStyle() & LVS_REPORT);
-
-	CListCtrl& listCtrl = GetListCtrl();
-
-	// Insert a column. This override is the most convenient.
-	listCtrl.InsertColumn(0, _T("Player Name"), LVCFMT_LEFT);
-
-	// The other InsertColumn() override requires an initialized
-	// LVCOLUMN structure.
-	LVCOLUMN col;
-	col.mask = LVCF_FMT | LVCF_TEXT;
-	col.pszText = _T("Jersey Number");
-	col.fmt = LVCFMT_LEFT;
-	listCtrl.InsertColumn(1, &col);
-
-	// Set reasonable widths for our columns
-	listCtrl.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
-	listCtrl.SetColumnWidth(1, LVSCW_AUTOSIZE_USEHEADER);
-}
-
