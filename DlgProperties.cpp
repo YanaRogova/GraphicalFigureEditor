@@ -47,14 +47,6 @@ BOOL CDlgProperties::OnInitDialog()
 	m_ptrCBoxLinkDirection = static_cast<CComboBox*>(GetDlgItem(IDC_COMBO_DIRECTION));
 	pView->FillComboBox(pView->LinkDirection, *m_ptrCBoxLinkDirection);
 
-	//m_ptrCBoxLinkFirstFigure = static_cast<CComboBox*>(GetDlgItem(IDC_COMBO_FIRST_FIGURE));
-	//pView->FillComboBox(pView->BrushStylesNames, *m_ptrCBoxBrushStyles);
-	//pView->UpdateDlgLinkComboBox(*m_ptrCBoxLinkFirstFigure, TRUE);
-
-	//m_ptrCBoxLinkSecondFigure = static_cast<CComboBox*>(GetDlgItem(IDC_COMBO_SECOND_FIGURE));
-	//pView->FillComboBox(pView->BrushStylesNames, *m_ptrCBoxBrushStyles);
-	//pView->UpdateDlgLinkComboBox(*m_ptrCBoxLinkSecondFigure, FALSE);
-
 	m_strFigure = pView->GetFigureType();
 	
 	return 0;
@@ -99,6 +91,7 @@ CDlgProperties::CDlgProperties(CWnd* pParent /*=nullptr*/) : CDialog(IDD_DLG_PRO
 
 CDlgProperties::~CDlgProperties()
 {
+
 }
 
 void CDlgProperties::SetData()
@@ -452,7 +445,7 @@ void CDlgProperties::OnButSetBrushColor()
 
 
 BEGIN_MESSAGE_MAP(CDlgProperties, CDialog)
-	ON_WM_CREATE()
+	
 	ON_WM_CTLCOLOR()
 	//ON_WM_ERASEBKGND()
 	ON_EN_CHANGE(IDC_EDIT_NAME, OnEditName)

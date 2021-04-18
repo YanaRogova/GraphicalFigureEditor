@@ -45,17 +45,29 @@ void CGraphicalWindow::OnPaint()
 	CDC* pDCPaint = GetDC();
 	CMemDC memDC(*pDCPaint, this);
 	CDC* pDC = &memDC.GetDC();
-	
+	CRect currentRect;
 	CRect rect;
+	CEditorView* pView = static_cast<CEditorView*>(GetParent());
+	//currentRect = pView->GetCurrentRect();
+	//CRect rect(-1, -1, pView->GetWidth() - 1, pView->GetHeight() - 1);
 	GetWindowRect(rect);
 	ScreenToClient(rect);
-	rect.DeflateRect(1, 1, 1, 1);
-	pDC->FillSolidRect(rect, RGB(255, 255, 255));
+	/*if (pView->GetHScrollPosition() != 0)
+	{
+		rect.left += pView->GetHScrollPosition();
+		rect.right += pView->GetHScrollPosition();
+	}*/
 	
+	rect.DeflateRect(1, 1, 1, 1);
+	//pDC->OffsetWindowOrg(pView->GetHScrollPosition(), 0);
+	pDC->FillSolidRect(rect, RGB(255, 255, 255));
+	//pDC->
 	for (int i = 0; i < m_Figure.size(); i++)
 	{
 		if (m_Figure[i]->GetCanDraw())
 		{
+			m_Figure[i]->SetHScrollPosition(-pView->GetHScrollPosition());
+			m_Figure[i]->SetVScrollPosition(-pView->GetVScrollPosition());
 			m_Figure[i]->DrawFigure(pDC);
 		}
 	}
@@ -71,6 +83,11 @@ void CGraphicalWindow::PreCreateFigure()
 
 void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	CEditorView* pView = static_cast<CEditorView*>(GetParent());
+
+	CPoint tempPoint;
+	tempPoint.x = point.x + pView->GetHScrollPosition();
+	tempPoint.y = point.y + pView->GetVScrollPosition();
 	int nNumberVertice;
 	if (m_bLButtonUp == TRUE)
 	{
@@ -123,7 +140,7 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 		{
 		case FIGURE_ELLIPSE:
 		case FIGURE_RECTANGLE:
-			m_Figure[m_Figure.size() - 1]->m_vCoordinates[0] = point;
+			m_Figure[m_Figure.size() - 1]->m_vCoordinates[0] = tempPoint;
 			m_bFigureDone = TRUE;
 			break;
 
@@ -132,7 +149,7 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 
 			if (nNumberVertice < 3)
 			{
-				m_Figure[m_Figure.size() - 1]->SetVertice(nNumberVertice, point);
+				m_Figure[m_Figure.size() - 1]->SetVertice(nNumberVertice, tempPoint);
 			}
 			break;
 
@@ -144,8 +161,7 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 				m_Figure.pop_back();
 				m_bFigureDone = TRUE;
 			}
-			MoveFigure(point);
-			CEditorView* pView = static_cast<CEditorView*>(GetParent());
+			MoveFigure(tempPoint);
 			pView->UpdateLinks(m_nSelectedFigure);
 			UpdateList();
 			break;
@@ -159,15 +175,20 @@ void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CGraphicalWindow::OnLButtonUp(UINT nFlags, CPoint point)
 {
+	CEditorView* pView = static_cast<CEditorView*>(GetParent());
+
+	CPoint tempPoint;
+	tempPoint.x = point.x + pView->GetHScrollPosition();
+	tempPoint.y = point.y + pView->GetVScrollPosition();
 	if (m_nFigureType >= 0 && m_bLButtonUp == FALSE && m_bLButtonDown == TRUE)
 	{
 		switch (m_nFigureType) {
 		case FIGURE_ELLIPSE:
 		case FIGURE_RECTANGLE:
-			if (point != m_Figure[m_Figure.size() - 1]->m_vCoordinates[0])
+			if (tempPoint != m_Figure[m_Figure.size() - 1]->m_vCoordinates[0])
 			{
 				m_nSelectedFigure = m_Figure.size() - 1;
-				m_Figure[m_nSelectedFigure]->SetCoordinates(point);
+				m_Figure[m_nSelectedFigure]->SetCoordinates(tempPoint);
 			}
 			else
 			{
@@ -183,7 +204,7 @@ void CGraphicalWindow::OnLButtonUp(UINT nFlags, CPoint point)
 			if (m_Figure[m_Figure.size() - 1]->GetNumberVertices() == 3)
 			{
 				m_nSelectedFigure = m_Figure.size() - 1;
-				m_Figure[m_nSelectedFigure]->SetCoordinates(point);
+				m_Figure[m_nSelectedFigure]->SetCoordinates(tempPoint);
 				UpdateList();
 				m_bFigureDone = TRUE;
 				//SetFigureNameAndID();
@@ -281,8 +302,13 @@ void CGraphicalWindow::SaveElement(int nNumberElement, CFile &file)
 
 void CGraphicalWindow::SavePicture(CString strFileName)
 {
+	CEditorView* pView = static_cast<CEditorView*>(GetParent());
 	CFile FilePicture;
 	FilePicture.Open(strFileName, CFile::modeCreate | CFile::modeWrite);
+	int num = pView->GetWidth();
+	NumberToFile(num, FilePicture);
+	num = pView->GetHeight();
+	NumberToFile(num, FilePicture);
 	for (int i = 0; i < m_Figure.size(); i++)
 	{
 		SaveElement(i, FilePicture);
@@ -386,12 +412,18 @@ bool CGraphicalWindow::CreateElement(CStdioFile& file)
 
 void CGraphicalWindow::OpenPicture(CString strFileName)
 {
+	CEditorView* pView = static_cast<CEditorView*>(GetParent());
 	m_nSelectedFigure = -1;
 	CStdioFile FilePicture;
 	FilePicture.Open(strFileName, CFile::modeRead);
-	std::string string;
 	bool bEndFile = FALSE;
-
+	CString string;
+	FilePicture.ReadString(string);
+	int n_Width = _wtoi(string);
+	FilePicture.ReadString(string);
+	//int n_Height = _wtoi(string);
+	pView->SetWidthAndHeight(n_Width, _wtoi(string));
+	pView->NewFile(FALSE);
 	m_setID.clear();
 	m_setNames.clear();
 	m_Figure.clear();
@@ -488,41 +520,3 @@ void CGraphicalWindow::DeleteFigure()
 
 	m_bPictureNotSaved = TRUE;
 }
-
-//
-//void CGraphicalWindow::CreateVerticalScrollbar(int nStartX, int nStartY, int m_nWidth, int m_nHeight)
-//{
-//	ModifyStyle(NULL, WS_VSCROLL | WS_HSCROLL);
-//	SetScrollRange(SB_VERT, nStartY, nStartY + m_nHeight, TRUE);
-//	SetScrollRange(SB_HORZ, nStartX, nStartX + m_nWidth, TRUE);
-//	pos = nStartY;
-//	/*SetScrollPos(SB_VERT, nStartY);
-//	SetScrollPos(SB_HORZ, nStartX);*/
-//	//SetScrollInfo(SB_VERT, )
-//}
-//
-//void CGraphicalWindow::CreateHorizontalScrollbar(int m_nWidth, int m_nHeight)
-//{
-//	ModifyStyle(NULL, WS_VSCROLL | WS_HSCROLL);
-//	SetScrollRange(SB_VERT, 0, m_nHeight, TRUE);
-//	SetScrollRange(SB_HORZ, 0, m_nWidth, TRUE);
-//}
-//
-//void CGraphicalWindow::OnVScroll(UINT SBCode, UINT Pos, CScrollBar* SB)
-//{
-//	//CWnd::OnVScroll(SBCode, Pos, SB);
-//	SB->SetScrollPos(SB_VERT, 40);
-//	pos = Pos;
-//}
-//
-//
-//void CGraphicalWindow::OnHScroll(UINT SBCode, UINT Pos, CScrollBar* SB)
-//{
-//	//CWnd::OnHScroll(SBCode, Pos, SB);
-//}
-//
-//BOOL CGraphicalWindow::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
-//{
-//	SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW)); // установить курсор, который взять из системы
-//	return TRUE;
-//}

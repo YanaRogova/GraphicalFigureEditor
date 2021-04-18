@@ -53,21 +53,23 @@ void CLink::DrawFigure(CDC* pDC)
 {
 	pDC->SelectObject(m_ptrBrush);
 	pDC->SelectObject(m_ptrPen);
+	CPoint tempCoordinates[2];
+	for (int i = 0; i < m_nVertices; i++)
+	{
+		tempCoordinates[i].x = m_vCoordinates[i].x + m_HScrollPosition;
+		tempCoordinates[i].y = m_vCoordinates[i].y + m_VScrollPosition;
+	}
 
-	//SetBkMode(hdc, TRANSPARENT);
-	
-	
-	//double ex = m_vCoordinates[0].x, ey = m_vCoordinates[0].y, bx = m_vCoordinates[1].x, by = m_vCoordinates[1].y;
-	pDC->MoveTo(m_vCoordinates[0]);
-	pDC->LineTo(m_vCoordinates[1]);
+	pDC->MoveTo(tempCoordinates[0]);
+	pDC->LineTo(tempCoordinates[1]);
 
 	CPen ArrowPen;
 	ArrowPen.CreatePen(PS_SOLID | PS_GEOMETRIC, m_nPenWidth, m_crPenColor);
 	pDC->SelectObject(&ArrowPen);
 	if(m_nDirection == 2 || m_nDirection == 3)
-		PaintArrow(m_vCoordinates[0], m_vCoordinates[1], pDC);
+		PaintArrow(tempCoordinates[0], tempCoordinates[1], pDC);
 	if (m_nDirection == 1 || m_nDirection == 3)
-		PaintArrow(m_vCoordinates[1], m_vCoordinates[0], pDC);
+		PaintArrow(tempCoordinates[1], tempCoordinates[0], pDC);
 	pDC->SelectObject(m_ptrPen);
 }
 

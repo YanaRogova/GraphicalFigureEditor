@@ -22,6 +22,8 @@ CFigure::CFigure(int nFigureType, int nPenStyle, int nPenWidth, COLORREF crPenCo
 	SetBrush();
 	SetPen();
 	m_bReturnNotRotateCoordinates = FALSE;
+	m_HScrollPosition = 0;
+	m_VScrollPosition = 0;
 }
 
 CFigure::~CFigure()
@@ -30,6 +32,15 @@ CFigure::~CFigure()
 	delete m_ptrPen;
 }
 
+void CFigure::SetHScrollPosition(int nPosition)
+{
+	m_HScrollPosition = nPosition;
+}
+
+void CFigure::SetVScrollPosition(int nPosition)
+{
+	m_VScrollPosition = nPosition;
+}
 
 void CFigure::SetCoordinates(CPoint point)
 {

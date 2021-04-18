@@ -25,6 +25,8 @@ protected:
 // Implementation
 public:
 	virtual ~CEditorView();
+	afx_msg void OnHScroll(UINT, UINT nPos, CScrollBar*);
+	afx_msg void OnVScroll(UINT, UINT nPos, CScrollBar*);
 	afx_msg int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void CEditorView::OnSize(UINT nType, int cx, int cy);
 	afx_msg void CEditorView::OnButtonRect();
@@ -52,7 +54,7 @@ public:
 	afx_msg void CEditorView::OnButtonTriangle();
 	afx_msg void CEditorView::SaveFile(CString strFileName);
 	afx_msg void CEditorView::OpenFile(CString strFileName);
-	afx_msg void CEditorView::NewFile();
+	afx_msg void CEditorView::NewFile(bool bChangePictureSize = TRUE);
 	afx_msg HBRUSH CEditorView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 
 	bool CEditorView::FigureListNotEmpty();
@@ -88,7 +90,11 @@ public:
 	CString CEditorView::GetFigureType();
 	bool CEditorView::PictureNotSaved();
 
-
+	int CEditorView::GetWidth();
+	int CEditorView::GetHeight();
+	void CEditorView::SetWidthAndHeight(int nWidth, int nHeight);
+	int CEditorView::GetHScrollPosition();
+	int CEditorView::GetVScrollPosition();
 
 	void CEditorView::UpdateLinks(int nItem);
 	// Generated message map functions
@@ -138,6 +144,12 @@ protected:
 	int m_nHeight;
 	int m_nWidth;
 	bool bNewGraphicalWindow;
+
+	CScrollBar m_VScrollbar;
+	CScrollBar m_HScrollbar;
+	
+	int m_HScrollPosition;
+	int m_VScrollPosition;
 	//CMyListView m_List;
 	//CListView m;
 };

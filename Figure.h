@@ -88,7 +88,8 @@ protected:
 	CPen *m_ptrPen;
 	CBrush *m_ptrBrush;
 	bool m_bReturnNotRotateCoordinates;
-
+	int m_HScrollPosition;
+	int m_VScrollPosition;
 	//CGraphicalWindow *ptr;
 public:
 	CPoint m_vCoordinates[4];
@@ -96,6 +97,8 @@ public:
 	CPoint m_CenterCoordinates;
 	double m_xHalfLength;
 	double m_yHalfLength;
+	void SetHScrollPosition(int nPosition);
+	void SetVScrollPosition(int nPosition);
 	
 };
 

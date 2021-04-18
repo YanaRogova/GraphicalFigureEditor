@@ -39,12 +39,27 @@ void CRectangle::DrawFigure(CDC* pDC)
 
 	HDC hdc = static_cast<HDC>(*pDC);
 	SetBkMode(hdc, TRANSPARENT);
+	CPoint tempCoordinates[4];
 	
+
 	if (m_nAngle == 0)
-		pDC->Polygon(&m_vCoordinates[0], 4);
+	{
+		for (int i = 0; i < m_nVertices; i++)
+		{
+			tempCoordinates[i].x = m_vCoordinates[i].x + m_HScrollPosition;
+			tempCoordinates[i].y = m_vCoordinates[i].y + m_VScrollPosition;
+		}
+		pDC->Polygon(&tempCoordinates[0], 4);
+	}
+		
 	else
 	{
 		Rotate();
+		for (int i = 0; i < m_nVertices; i++)
+		{
+			tempCoordinates[i].x = m_vAngleCoordinates[i].x + m_HScrollPosition;
+			tempCoordinates[i].y = m_vAngleCoordinates[i].y + m_VScrollPosition;
+		}
 		pDC->Polygon(&m_vAngleCoordinates[0], 4);
 	}
 }

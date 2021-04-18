@@ -186,6 +186,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DlgProperties.h" />
+    <ClInclude Include="DlgResize.h" />
     <ClInclude Include="EditorView.h" />
     <ClInclude Include="Ellipse.h" />
     <ClInclude Include="Figure.h" />
@@ -203,6 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DlgProperties.cpp" />
+    <ClCompile Include="DlgResize.cpp" />
     <ClCompile Include="EditorView.cpp" />
     <ClCompile Include="Ellipse.cpp" />
     <ClCompile Include="Figure.cpp" />

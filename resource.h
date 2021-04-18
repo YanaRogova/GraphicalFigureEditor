@@ -7,6 +7,8 @@
 #define IDS_BUT_RECTANGLE               129
 #define IDR_GraphicalFigureEditorTYPE   130
 #define IDD_DLG_PROPERTIES              312
+#define IDD_DIALOG1                     314
+#define IDD_DLG_RESIZE                  314
 #define IDC_EDIT_NAME                   1005
 #define IDC_EDIT_ID                     1006
 #define IDC_EDIT_ANGLE                  1007
@@ -18,6 +20,8 @@
 #define IDC_STATIC_OBJECT               1014
 #define IDC_BUT_SET_PEN                 1015
 #define IDC_BUT_SET_BRUSH               1016
+#define IDC_EDIT1                       1016
+#define IDC_EDIT2                       1017
 #define IDC_CENTER_X                    1021
 #define IDC_CENTER_Y                    1022
 #define IDC_VERTICES_X1                 1025
@@ -77,9 +81,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        314
+#define _APS_NEXT_RESOURCE_VALUE        316
 #define _APS_NEXT_COMMAND_VALUE         32777
-#define _APS_NEXT_CONTROL_VALUE         1016
+#define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

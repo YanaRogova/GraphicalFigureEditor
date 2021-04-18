@@ -47,31 +47,36 @@ void CEllipse::DrawFigure(CDC* pDC)
 
 	pDC->SelectObject(m_ptrBrush);
 	pDC->SelectObject(m_ptrPen);
-
+	CPoint tempCoordinates[7];
 	if (!bNormalised)
 	{
 		if (m_nAngle == 0)
 		{
-			pDC->BeginPath();
-			pDC->PolyBezier(m_vDrawCoordinates, 7);
-			pDC->EndPath();
-			pDC->FillPath();
-			pDC->PolyBezier(m_vDrawCoordinates, 7);
-
+			for (int i = 0; i < m_nVertices; i++)
+			{
+				tempCoordinates[i].x = m_vDrawCoordinates[i].x + m_HScrollPosition;
+				tempCoordinates[i].y = m_vDrawCoordinates[i].y + m_VScrollPosition;
+			}
 		}
 		else
 		{
 			Rotate();
-			pDC->BeginPath();
-			pDC->PolyBezier(m_vAngleCoordinates, 7);
-			pDC->EndPath();
-			pDC->FillPath();
-			pDC->PolyBezier(m_vAngleCoordinates, 7);
+			for (int i = 0; i < m_nVertices; i++)
+			{
+				tempCoordinates[i].x = m_vAngleCoordinates[i].x + m_HScrollPosition;
+				tempCoordinates[i].y = m_vAngleCoordinates[i].y + m_VScrollPosition;
+			}
 		}
+		pDC->BeginPath();
+		pDC->PolyBezier(tempCoordinates, 7);
+		pDC->EndPath();
+		pDC->FillPath();
+		pDC->PolyBezier(tempCoordinates, 7);
 	}
 	else
 	{
-		pDC->Ellipse(m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[2].x, m_vCoordinates[2].y);
+		pDC->Ellipse(m_vCoordinates[0].x + m_HScrollPosition, m_vCoordinates[0].y + m_VScrollPosition,
+			m_vCoordinates[2].x + m_HScrollPosition, m_vCoordinates[2].y + m_VScrollPosition);
 	}
 	
 }

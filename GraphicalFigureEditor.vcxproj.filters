@@ -60,6 +60,9 @@
     <ClInclude Include="Link.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DlgResize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GraphicalFigureEditor.cpp">
@@ -96,6 +99,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Link.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgResize.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

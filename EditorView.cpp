@@ -37,7 +37,9 @@
 #define ID_CBOX_FIRST_FIGURE	1323
 #define ID_CBOX_SECOND_FIGURE	1324
 #define ID_CBOX_LINK_DIRECTION	1325
-
+#define ID_VSCROLLBAR			1326
+#define ID_HSCROLLBAR			1327
+	
 
 // CChildView
 
@@ -51,6 +53,8 @@ CEditorView::CEditorView()
 	m_nHeight = 0;
 	m_nWidth = 0;
 	bNewGraphicalWindow = FALSE;
+	m_HScrollPosition = 0;
+	m_VScrollPosition = 0;
 }
 
 CEditorView::~CEditorView()
@@ -63,6 +67,8 @@ BEGIN_MESSAGE_MAP(CEditorView, CWnd)
 	ON_WM_PAINT()
 	ON_WM_CREATE()
 	ON_WM_CTLCOLOR()
+	ON_WM_HSCROLL()
+	ON_WM_VSCROLL()
 	ON_COMMAND(ID_BUT_RECTANGLE, OnButtonRect)
 	ON_COMMAND(ID_BUT_ELLIPSE, OnButtonEllipse)
 	ON_COMMAND(ID_BUT_LINK, OnButtonLink)
@@ -87,7 +93,97 @@ BEGIN_MESSAGE_MAP(CEditorView, CWnd)
 	ON_EN_CHANGE(ID_ED_ID, OnEditID)
 END_MESSAGE_MAP()
 
+afx_msg void  CEditorView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	int minpos;
+	int maxpos;
+	pScrollBar->GetScrollRange(&minpos, &maxpos);
+	int curpos = pScrollBar->GetScrollPos();
+	switch (nSBCode)
+	{
+	case SB_LEFT:         //Scrolls to the lower right. 
+		curpos = minpos;
+		break;
+	case SB_RIGHT:         //Scrolls to the lower right.
+		curpos = maxpos;
+		break;
+	case SB_ENDSCROLL:      //Ends scroll. 
+		break;
+	case SB_LINEDOWN:       //Scrolls one line down. 
+		curpos++;
+		break;
+	case SB_LINEUP:         //Scrolls one line up.
+		curpos--;
+		break;
+	case SB_PAGEDOWN:       //Scrolls one page down.
+		curpos += 5;
+		break;
+	case SB_PAGEUP:         //Scrolls one page up. 
+		curpos -= 5;
+		break;
+	case SB_THUMBPOSITION:  //The user has dragged the scroll box (thumb) and released the mouse button. The nPos parameter indicates the position of the scroll box at the end of the drag operation. 
+		curpos = nPos;
+		break;
+	case SB_THUMBTRACK:     //The user is dragging the scroll box. This message is sent repeatedly until the user releases the mouse button. The nPos parameter indicates the position that the scroll box has been dragged to. 
+		curpos = nPos;
+		break;
+	}
+	pScrollBar->SetScrollPos(curpos);
+	m_HScrollPosition = curpos;
+	m_GraphicalWindow.OnPaint();
+}
 
+
+afx_msg void  CEditorView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	int minpos;
+	int maxpos;
+	pScrollBar->GetScrollRange(&minpos, &maxpos);
+	int curpos = pScrollBar->GetScrollPos();
+	switch (nSBCode)
+	{
+	case SB_LEFT:         //Scrolls to the lower right. 
+		curpos = minpos;
+		break;
+	case SB_RIGHT:         //Scrolls to the lower right.
+		curpos = maxpos;
+		break;
+	case SB_ENDSCROLL:      //Ends scroll. 
+		break;
+	case SB_LINEDOWN:       //Scrolls one line down. 
+		curpos++;
+		break;
+	case SB_LINEUP:         //Scrolls one line up.
+		curpos--;
+		break;
+	case SB_PAGEDOWN:       //Scrolls one page down.
+		curpos += 5;
+		break;
+	case SB_PAGEUP:         //Scrolls one page up. 
+		curpos -= 5;
+		break;
+	case SB_THUMBPOSITION:  //The user has dragged the scroll box (thumb) and released the mouse button. The nPos parameter indicates the position of the scroll box at the end of the drag operation. 
+		curpos = nPos;
+		break;
+	case SB_THUMBTRACK:     //The user is dragging the scroll box. This message is sent repeatedly until the user releases the mouse button. The nPos parameter indicates the position that the scroll box has been dragged to. 
+		curpos = nPos;
+		break;
+	}
+	pScrollBar->SetScrollPos(curpos);
+	m_VScrollPosition = curpos;
+	m_GraphicalWindow.OnPaint();
+}
+
+
+int CEditorView::GetHScrollPosition()
+{
+	return m_HScrollPosition;
+}
+
+int CEditorView::GetVScrollPosition()
+{
+	return m_VScrollPosition;
+}
 
 // CChildView message handlers
 
@@ -377,6 +473,12 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		CRect(), this, ID_BUT_RIGHT_ROTATE);
 	m_ButRightRotate.SetFont(&m_Font);
 
+	m_VScrollbar.Create(WS_VISIBLE | WS_CHILD | WS_BORDER | SS_NOTIFY | SBS_VERT,
+		CRect(), this, ID_VSCROLLBAR);
+
+	m_HScrollbar.Create(WS_VISIBLE | WS_CHILD | WS_BORDER | SS_NOTIFY | SBS_HORZ,
+		CRect(), this, ID_HSCROLLBAR);
+	
 	//SendMessageToDescendants(WM_SETFONT,
 	//	(WPARAM)m_Font.m_hObject,  //handle to font
 	//	MAKELONG((WORD)FALSE, 0),
@@ -505,7 +607,7 @@ void CEditorView::OpenFile(CString strFileName)
 	m_GraphicalWindow.OpenPicture(strFileName);
 }
 
-void CEditorView::NewFile()
+void CEditorView::NewFile(bool bChangePictureSize)
 {
 	m_GraphicalWindow.m_setID.clear();
 	m_GraphicalWindow.m_setNames.clear();
@@ -514,8 +616,11 @@ void CEditorView::NewFile()
 	CRect EditorViewRect;
 	GetClientRect(EditorViewRect);
 	//ScreenToClient(EditorViewRect);
-	m_nWidth = EditorViewRect.Width() - 730;
-	m_nHeight = EditorViewRect.Height() - 207;
+	if (bChangePictureSize)
+	{
+		m_nWidth = EditorViewRect.Width() - 730;
+		m_nHeight = EditorViewRect.Height() - 207;
+	}
 	int nCenterX = (EditorViewRect.Width() - 720 + 10) / 2;
 	int nCenterY = (EditorViewRect.Height() - 10 + 197) / 2;
 
@@ -756,48 +861,97 @@ void CEditorView::OnSize(UINT nType, int cx, int cy)
 
 	int nCenterX = (cx - 720 + 10) / 2;
 	int nCenterY = (cy - 10 + 197) / 2;
-
-	
-	CPoint Coordinate[2];
-	if (m_nWidth % 2 == 1)
-		Coordinate[1].x = nCenterX + (m_nWidth / 2 + 1);
-	else
-		Coordinate[1].x = nCenterX + m_nWidth / 2;
-
-	if (m_nHeight % 2 == 1)
-		Coordinate[1].y = nCenterY + (m_nHeight / 2 + 1);
-	else
-		Coordinate[1].y = nCenterY + m_nHeight / 2;
-
-	if (m_nHeight > cy - 207)
-	{
-		
-		Coordinate[0].y = 197;
-		Coordinate[1].y = cy - 10;
-		/*m_GraphicalWindow.CreateVerticalScrollbar(Coordinate[1].x - Coordinate[0].x, Coordinate[1].y - Coordinate[0].y,
-			m_nWidth - Coordinate[1].x, m_nHeight - Coordinate[1].y);*/
-
-	}
-	else
-	{
-		m_GraphicalWindow.ModifyStyle(WS_VSCROLL | WS_HSCROLL, NULL);
-		Coordinate[0].y = nCenterY - m_nHeight / 2;
-	}
-
+	int VScrollWidth = 0;
+	int HScrollHeight = 0;
+	int TempWidth = m_nWidth;
+	int TempHeight = m_nHeight;
 	if (m_nWidth > cx - 720)
 	{
-		Coordinate[0].x = 10;
-		Coordinate[1].x = cx - 720;
-		/*m_GraphicalWindow.CreateHorizontalScrollbar(Coordinate[1].x - Coordinate[0].x, Coordinate[1].y - Coordinate[0].y,
-			m_nWidth - Coordinate[1].x, m_nHeight - Coordinate[1].y);*/
+		HScrollHeight = 20;
+	}
+	else
+		m_HScrollbar.ShowWindow(SW_HIDE);
+
+	if (m_nHeight + HScrollHeight > cy - 207)
+	{
+		m_VScrollbar.ShowWindow(SW_SHOW);
+		VScrollWidth = 20;
+	}
+	else
+		m_VScrollbar.ShowWindow(SW_HIDE);
+
+	if (m_nWidth + VScrollWidth > cx - 720)
+	{
+		m_HScrollbar.ShowWindow(SW_SHOW);
+		HScrollHeight = 20;
+	}
+	else
+		m_HScrollbar.ShowWindow(SW_HIDE);
+
+	TempWidth -= VScrollWidth;
+	TempHeight -= HScrollHeight;
+	nCenterX -= VScrollWidth ;
+	nCenterY -= HScrollHeight ;
+
+	CPoint Coordinate[2];
+	
+
+
+	if (VScrollWidth != 0)
+	{
+		//nCenterX -= 10;
+		if (HScrollHeight != 0)
+		{
+			Coordinate[1].y = cy - 30;
+		}
+		else
+		{
+			Coordinate[1].y = cy - 10;
+		}
+		Coordinate[0].y = 197;
+		
 	}
 	else
 	{
-		//m_GraphicalWindow.ModifyStyle(WS_VSCROLL | WS_HSCROLL, NULL);
+		Coordinate[0].y = nCenterY - m_nHeight / 2;
+		if (m_nHeight % 2 == 1)
+			Coordinate[1].y = nCenterY + (m_nHeight / 2 + 1);
+		else
+			Coordinate[1].y = nCenterY + m_nHeight / 2;
+	}
+
+	if (HScrollHeight != 0)
+	{
+		//nCenterY -= 20;
+		if (VScrollWidth != 0)
+		{
+			Coordinate[1].x = cx - 740;
+		}
+		else
+		{
+			Coordinate[1].x = cx - 720;
+		}
+		Coordinate[0].x = 10;
+
+
+	}
+	else
+	{
 		Coordinate[0].x = nCenterX - m_nWidth / 2;
+		if (m_nWidth % 2 == 1)
+			Coordinate[1].x = nCenterX + (m_nWidth / 2 + 1);
+		else
+			Coordinate[1].x = nCenterX + m_nWidth / 2;
 	}
 	
+	m_HScrollbar.MoveWindow(CRect(Coordinate[0].x, Coordinate[1].y, Coordinate[1].x, Coordinate[1].y + 20));
+	m_VScrollbar.MoveWindow(CRect(Coordinate[1].x, Coordinate[0].y, Coordinate[1].x + 20, Coordinate[1].y));
 	m_GraphicalWindow.MoveWindow(CRect(Coordinate[0].x, Coordinate[0].y, Coordinate[1].x, Coordinate[1].y));
+
+	m_HScrollbar.SetScrollRange(0, m_nWidth-(Coordinate[1].x - Coordinate[0].x));
+	m_VScrollbar.SetScrollRange(0, m_nHeight-(Coordinate[1].y - Coordinate[0].y));
+	m_HScrollPosition = 0;
+	m_VScrollPosition = 0;
 }
 
 bool CEditorView::FigureListNotEmpty()
@@ -1160,4 +1314,19 @@ void CEditorView::UpdateLinkFigures(CString strName, bool bFirstSecond)
 			SetVertice(1, m_GraphicalWindow.m_Figure[nCurSel]->GetCenter());
 	}
 	m_GraphicalWindow.OnPaint();
+}
+
+int CEditorView::GetWidth()
+{
+	return m_nWidth;
+}
+int CEditorView::GetHeight()
+{
+	return m_nHeight;
+}
+
+void CEditorView::SetWidthAndHeight(int nWidth, int nHeight)
+{
+	m_nWidth = nWidth;
+	m_nHeight = nHeight;
 }

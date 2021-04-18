@@ -7,6 +7,7 @@
 #include "GraphicalFigureEditor.h"
 
 #include "MainFrm.h"
+#include "DlgResize.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -161,14 +162,14 @@ void CMainFrame::OnNew()
 
 void CMainFrame::OnResize()
 {
-	int result;
-	if (m_wndView.PictureNotSaved())
+	CDlgResize dlgResize(m_wndView.GetWidth(), m_wndView.GetHeight());
+	int result = dlgResize.DoModal();
+	if (result == IDOK)
 	{
-		result = AfxMessageBox(L"Do you want to save changes to the current file?", MB_YESNO);
-		if (result == IDYES)
-		{
-			OnFileSaveAs();
-		}
+		m_wndView.SetWidthAndHeight(dlgResize.m_nWidth, dlgResize.m_nHeight);
+		CRect rect;
+		m_wndView.GetWindowRect(rect);
+		m_wndView.OnSize(NULL, rect.Width(), rect.Height());
 	}
 }
 
