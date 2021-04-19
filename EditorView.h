@@ -20,6 +20,7 @@ public:
 	
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	void ShowMainElements();
 
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -139,7 +140,5 @@ protected:
 	int m_HScrollPosition;
 	int m_VScrollPosition;
 	bool bNewGraphicalWindow;
+	bool bFirstFileCreated;
 };
-
-
-

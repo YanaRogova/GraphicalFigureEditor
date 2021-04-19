@@ -20,12 +20,13 @@ protected:
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void OnFileSaveAs();
 	afx_msg void OnFileOpen();
-	afx_msg void OnNew();
 	afx_msg void OnResize();
+	afx_msg void OnClose();
 	DECLARE_MESSAGE_MAP()
 
 public:
 
+	afx_msg void OnNew();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

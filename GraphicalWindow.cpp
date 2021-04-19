@@ -212,7 +212,11 @@ void CGraphicalWindow::OpenPicture(CString strFileName)
 	int n_Width = _wtoi(string);
 	FilePicture.ReadString(string);
 	pView->SetWidthAndHeight(n_Width, _wtoi(string));
+	
 	pView->NewFile(FALSE);
+	CRect rect;
+	pView->GetWindowRect(rect);
+	pView->OnSize(NULL, rect.Width(), rect.Height());
 	m_setID.clear();
 	m_setNames.clear();
 	m_Figure.clear();
@@ -222,6 +226,7 @@ void CGraphicalWindow::OpenPicture(CString strFileName)
 	}
 	FilePicture.Close();
 	m_nSelectedFigure = m_Figure.size() - 1;
+
 	OnPaint();
 	UpdateList();
 }
@@ -489,5 +494,4 @@ BOOL CGraphicalWindow::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
 		OnPaint();
 	}
 	return 1;
-
 }

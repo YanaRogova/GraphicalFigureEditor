@@ -53,6 +53,7 @@ CEditorView::CEditorView()
 	bNewGraphicalWindow = FALSE;
 	m_HScrollPosition = 0;
 	m_VScrollPosition = 0;
+	bFirstFileCreated = FALSE;
 }
 
 CEditorView::~CEditorView()
@@ -72,6 +73,33 @@ BOOL CEditorView::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
+void CEditorView::ShowMainElements()
+{
+	m_ButRect.ShowWindow(SW_SHOW);
+	m_ButTriangle.ShowWindow(SW_SHOW);
+	m_ButEllipse.ShowWindow(SW_SHOW);
+	m_StaticName.ShowWindow(SW_SHOW);
+	m_EditName.ShowWindow(SW_SHOW);
+	m_StaticID.ShowWindow(SW_SHOW);
+	m_EditID.ShowWindow(SW_SHOW);
+	m_StaticPenWidth.ShowWindow(SW_SHOW);
+	m_EditPenWidth.ShowWindow(SW_SHOW);
+	m_StaticPenType.ShowWindow(SW_SHOW);
+	m_StaticBrush.ShowWindow(SW_SHOW);
+	m_CBoxPenStyles.ShowWindow(SW_SHOW);
+	m_CBoxBrushStyles.ShowWindow(SW_SHOW);
+	m_ButChousePenColor.ShowWindow(SW_SHOW);
+	m_ButChouseBrushColor.ShowWindow(SW_SHOW);
+	m_ButDelete.ShowWindow(SW_SHOW);
+	m_ButNormalizeFigure.ShowWindow(SW_SHOW);
+	m_ButMove.ShowWindow(SW_SHOW);
+	m_StaticAngle.ShowWindow(SW_SHOW);
+	m_EditFigureAngle.ShowWindow(SW_SHOW);
+	m_ButLeftRotate.ShowWindow(SW_SHOW);
+	m_ButRightRotate.ShowWindow(SW_SHOW);
+	m_List.ShowWindow(SW_SHOW);
+}
+
 int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
@@ -85,9 +113,6 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_GraphicalWindow.Create(L"", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_NOTIFY,
 		CRect(), this, ID_OUTPUT_WINDOW);
-
-	m_dlgFigureProperties.Create(IDD_DLG_PROPERTIES, this);
-	m_dlgFigureProperties.ShowWindow(SW_HIDE);
 
 	int x = 10, y = 10;
 	m_ButRect.Create(L"Rectangle", WS_VISIBLE | WS_CHILD,
@@ -183,6 +208,7 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_StaticBrush.Create(L"Brush type:", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
 		CRect(x, y, x + 100, y + 25), this, ID_STATIC);
 	m_StaticBrush.SetFont(&m_Font);
+
 	m_StaticDirection.Create(L"Direction:", WS_VISIBLE | WS_CHILD | SS_CENTERIMAGE | SS_LEFT,
 		CRect(x, y, x + 100, y + 25), this, ID_STATIC);
 	m_StaticDirection.SetFont(&m_Font);
@@ -269,6 +295,7 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_List.SetExtendedStyle(LVS_EX_FULLROWSELECT);
 	m_List.SetFont(&m_ListFont);
 
+
 	std::vector<CString> m_strColomns = { L"¹", L"Name", L"ID", L"Type", L"Center", L"Coordinates", L"Angle" };
 	std::vector<int> m_strColomnsSize = { 30, 115, 30, 80, 80, 310, 55 };
 	for (int i = 0; i < 7; i++)
@@ -276,13 +303,20 @@ int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		m_List.InsertColumn(i, m_strColomns[i], LVCFMT_LEFT, m_strColomnsSize[i]);
 	}
 
-	FigureOrLink(TRUE);
-
+	m_dlgFigureProperties.Create(IDD_DLG_PROPERTIES, this);
+	m_dlgFigureProperties.ShowWindow(SW_HIDE);
+	
 	return 0;
 }
 
 void CEditorView::OnSize(UINT nType, int cx, int cy)
 {
+	if (cx != NULL && cy != NULL && bFirstFileCreated == FALSE)
+	{
+		bFirstFileCreated = TRUE;
+		m_nWidth = cx - 730;
+		m_nHeight = cy - 207;
+	}
 	m_List.MoveWindow(CRect(cx - 710, 400, cx - 10, cy - 10));
 	m_dlgFigureProperties.MoveWindow(CRect(cx - 710, 10, cx - 10, 360));
 
@@ -396,7 +430,6 @@ void CEditorView::OnNotify(NMHDR* pNotifyStruct, LRESULT* result)
 	if (m_List.GetSelectionMark() != -1)
 	{
 		m_GraphicalWindow.m_nSelectedFigure = m_GraphicalWindow.m_Figure.size() - m_List.GetSelectionMark() - 1;
-		m_List.SetHotItem(m_GraphicalWindow.m_Figure.size() - m_GraphicalWindow.m_nSelectedFigure - 1);
 		m_dlgFigureProperties.SetData();
 	}
 }
@@ -702,11 +735,13 @@ void CEditorView::NewFile(bool bChangePictureSize)
 	UpdateListView(TRUE);
 	CRect EditorViewRect;
 	GetClientRect(EditorViewRect);
+
 	if (bChangePictureSize)
 	{
 		m_nWidth = EditorViewRect.Width() - 730;
 		m_nHeight = EditorViewRect.Height() - 207;
 	}
+
 	int nCenterX = (EditorViewRect.Width() - 720 + 10) / 2;
 	int nCenterY = (EditorViewRect.Height() - 10 + 197) / 2;
 
@@ -723,6 +758,9 @@ void CEditorView::NewFile(bool bChangePictureSize)
 		SecondCoordinate.y = nCenterY + m_nHeight / 2;
 
 	m_GraphicalWindow.MoveWindow(CRect(nCenterX - m_nWidth / 2, nCenterY - m_nHeight / 2, SecondCoordinate.x, SecondCoordinate.y));
+	m_HScrollbar.ShowWindow(SW_HIDE);
+	m_VScrollbar.ShowWindow(SW_HIDE);
+	ShowMainElements();
 	Invalidate();
 }
 

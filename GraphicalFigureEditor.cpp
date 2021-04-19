@@ -11,9 +11,6 @@
 #endif
 
 BEGIN_MESSAGE_MAP(CGraphicalFigureEditorApp, CWinApp)
-	ON_COMMAND(ID_APP_ABOUT, &CGraphicalFigureEditorApp::OnAppAbout)
-	ON_COMMAND(ID_FILE_NEW, &CWinApp::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, &CWinApp::OnFileOpen)
 END_MESSAGE_MAP()
 
 CGraphicalFigureEditorApp::CGraphicalFigureEditorApp() noexcept
@@ -37,6 +34,7 @@ BOOL CGraphicalFigureEditorApp::InitInstance()
 		nullptr);
 	pFrame->ShowWindow(SW_SHOW);
 	pFrame->UpdateWindow();
+
 	return TRUE;
 }
 

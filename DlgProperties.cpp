@@ -185,6 +185,7 @@ BOOL CDlgProperties::OnInitDialog()
 	pView->FillComboBox(pView->LinkDirection, *m_ptrCBoxLinkDirection);
 
 	m_strFigure = pView->GetFigureType();
+
 	return 0;
 }
 

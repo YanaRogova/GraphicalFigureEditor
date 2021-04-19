@@ -14,10 +14,12 @@ IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
 	ON_WM_SETFOCUS()
+	ON_WM_CLOSE()
 	ON_COMMAND(ID_FILE_SAVE, OnFileSaveAs)
 	ON_COMMAND(ID_FILE_OPEN, OnFileOpen)
 	ON_COMMAND(ID_FILE_NEW, OnNew)
 	ON_COMMAND(ID_PICTURE_RESIZE, OnResize)
+	ON_COMMAND(ID_APP_EXIT, OnClose)
 END_MESSAGE_MAP()
 
 CMainFrame::CMainFrame() noexcept
@@ -38,7 +40,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	cs.cx = nxSize;
 	cs.cy = nySize;
 
-	cs.style = WS_OVERLAPPED | WS_CAPTION | FWS_ADDTOTITLE
+	cs.style = WS_OVERLAPPED | WS_CAPTION | FWS_ADDTOTITLE | WS_MAXIMIZE
 		| WS_SYSMENU | WS_OVERLAPPEDWINDOW;
 
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
@@ -65,6 +67,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		TRACE0("Failed to create view window\n");
 		return -1;
 	}
+	
 	return 0;
 }
 
@@ -96,7 +99,6 @@ void CMainFrame::OnFileOpen()
 			OnFileSaveAs();
 		}
 	}
-	m_wndView.NewFile();
 	CFileDialog dlgOpen(TRUE, L"gfe", NULL, OFN_OVERWRITEPROMPT | OFN_NOVALIDATE,
 		L"Graghical figure editor (*.gfe)|*.gfe|");
 	result = dlgOpen.DoModal();
@@ -132,6 +134,21 @@ void CMainFrame::OnResize()
 		m_wndView.GetWindowRect(rect);
 		m_wndView.OnSize(NULL, rect.Width(), rect.Height());
 	}
+}
+
+void CMainFrame::OnClose()
+{
+	int result;
+	if (m_wndView.PictureNotSaved())
+	{
+		result = AfxMessageBox(L"Do you want to save changes to the current file?", MB_YESNO);
+		if (result == IDYES)
+		{
+			OnFileSaveAs();
+		}
+	}
+
+	CFrameWnd::OnClose();
 }
 
 #ifdef _DEBUG

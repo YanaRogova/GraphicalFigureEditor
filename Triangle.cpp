@@ -78,7 +78,6 @@ void CTriangle::DrawFigure(CDC* pDC)
 			tempCoordinates[i].x = m_vCoordinates[i].x + m_HScrollPosition;
 			tempCoordinates[i].y = m_vCoordinates[i].y + m_VScrollPosition;
 		}
-		pDC->Polygon(&tempCoordinates[0], 3);
 	}
 	else
 	{
@@ -88,8 +87,8 @@ void CTriangle::DrawFigure(CDC* pDC)
 			tempCoordinates[i].x = m_vAngleCoordinates[i].x + m_HScrollPosition;
 			tempCoordinates[i].y = m_vAngleCoordinates[i].y + m_VScrollPosition;
 		}
-		pDC->Polygon(&tempCoordinates[0], 3);
 	}
+	pDC->Polygon(&tempCoordinates[0], 3);
 }
 
 void CTriangle::Normalize()
