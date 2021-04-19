@@ -13,31 +13,12 @@ CEllipse::~CEllipse()
 {
 }
 
-void CEllipse::NewCoordinates(int xHalfLength, int yHalfLength)
+void CEllipse::SetCoordinates(CPoint point)
 {
-	m_vCoordinates[0] = CPoint(m_CenterCoordinates.x - xHalfLength * 3 / 4, m_CenterCoordinates.y - yHalfLength);
-	m_vCoordinates[1] = CPoint(m_CenterCoordinates.x - xHalfLength * 3 / 4, m_CenterCoordinates.y + yHalfLength);
-	m_vCoordinates[2] = CPoint(m_CenterCoordinates.x + xHalfLength * 3 / 4, m_CenterCoordinates.y + yHalfLength);
-	m_vCoordinates[3] = CPoint(m_CenterCoordinates.x + xHalfLength * 3 / 4, m_CenterCoordinates.y - yHalfLength);
-	
-	m_vAngleReturnCoordinates[0] = RotatePoint(-m_xHalfLength * 3 / 4, -m_yHalfLength);
-	m_vAngleReturnCoordinates[1] = RotatePoint(-m_xHalfLength * 3 / 4, m_yHalfLength);
-	m_vAngleReturnCoordinates[2] = RotatePoint(m_xHalfLength * 3 / 4, m_yHalfLength);
-	m_vAngleReturnCoordinates[3] = RotatePoint(m_xHalfLength * 3 / 4, -m_yHalfLength);
-	for (int i = 0; i < 4; i++)
-	{
-		m_vAngleReturnCoordinates[i] = CPoint(m_CenterCoordinates.x + m_vAngleReturnCoordinates[i].x,
-			m_CenterCoordinates.y + m_vAngleReturnCoordinates[i].y);
-	}
-
-
-	m_vDrawCoordinates[0] = CPoint(m_CenterCoordinates.x, m_CenterCoordinates.y - yHalfLength);
-	m_vDrawCoordinates[1] = CPoint(m_CenterCoordinates.x - xHalfLength, m_CenterCoordinates.y - yHalfLength);
-	m_vDrawCoordinates[2] = CPoint(m_CenterCoordinates.x - xHalfLength, m_CenterCoordinates.y + yHalfLength);
-	m_vDrawCoordinates[3] = CPoint(m_CenterCoordinates.x, m_CenterCoordinates.y + yHalfLength);
-	m_vDrawCoordinates[4] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y + yHalfLength);
-	m_vDrawCoordinates[5] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y - yHalfLength);
-	m_vDrawCoordinates[6] = CPoint(m_CenterCoordinates.x, m_CenterCoordinates.y - yHalfLength);
+	CFigure::SetCoordinates(point);
+	m_xHalfLength = CFigure::m_xHalfLength * 4 / 3;
+	NewCoordinates(m_xHalfLength, m_yHalfLength);
+	m_bCanDraw = TRUE;
 }
 
 void CEllipse::DrawFigure(CDC* pDC)
@@ -78,7 +59,15 @@ void CEllipse::DrawFigure(CDC* pDC)
 		pDC->Ellipse(m_vCoordinates[0].x + m_HScrollPosition, m_vCoordinates[0].y + m_VScrollPosition,
 			m_vCoordinates[2].x + m_HScrollPosition, m_vCoordinates[2].y + m_VScrollPosition);
 	}
-	
+}
+
+void CEllipse::Normalize()
+{
+	m_yHalfLength = (m_xHalfLength * 3 / 4 + m_yHalfLength) / 2;
+	m_xHalfLength = m_yHalfLength * 4 / 3;
+
+	NewCoordinates(m_xHalfLength, m_yHalfLength);
+	bNormalised = TRUE;
 }
 
 void CEllipse::Rotate()
@@ -99,23 +88,6 @@ void CEllipse::Rotate()
 	NewCoordinates(m_xHalfLength, m_yHalfLength);
 }
 
-void CEllipse::SetCoordinates(CPoint point)
-{
-	CFigure::SetCoordinates(point);
-	m_xHalfLength = CFigure::m_xHalfLength * 4 / 3;
-	NewCoordinates(m_xHalfLength, m_yHalfLength);
-	m_bCanDraw = TRUE;
-}
-
-void CEllipse::Normalize()
-{
-	m_yHalfLength = (m_xHalfLength * 3 / 4 + m_yHalfLength) / 2;
-	m_xHalfLength = m_yHalfLength * 4 / 3;
-
-	NewCoordinates(m_xHalfLength, m_yHalfLength);
-	bNormalised = TRUE;
-}
-
 CString CEllipse::GetStrCoordinates()
 {
 	CString str;
@@ -123,16 +95,27 @@ CString CEllipse::GetStrCoordinates()
 		str.Format(L"{(%d, %d), (%d, %d), (%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x,
 			m_vCoordinates[1].y, m_vCoordinates[2].x, m_vCoordinates[2].y, m_vCoordinates[3].x, m_vCoordinates[3].y);
 	else
-		str.Format(L"{(%d, %d), (%d, %d), (%d, %d), (%d, %d)}", m_vAngleReturnCoordinates[0].x, m_vAngleReturnCoordinates[0].y, 
-			m_vAngleReturnCoordinates[1].x, m_vAngleReturnCoordinates[1].y, m_vAngleReturnCoordinates[2].x, 
+		str.Format(L"{(%d, %d), (%d, %d), (%d, %d), (%d, %d)}", m_vAngleReturnCoordinates[0].x, m_vAngleReturnCoordinates[0].y,
+			m_vAngleReturnCoordinates[1].x, m_vAngleReturnCoordinates[1].y, m_vAngleReturnCoordinates[2].x,
 			m_vAngleReturnCoordinates[2].y, m_vAngleReturnCoordinates[3].x, m_vAngleReturnCoordinates[3].y);
-	
+
 	return str;
 }
 
 CPoint* CEllipse::GetCoordinates()
 {
-	return m_vCoordinates;
+	if (m_nAngle == 0)
+		return m_vCoordinates;
+	else
+		return m_vAngleReturnCoordinates;
+}
+
+CPoint CEllipse::GetVertice(int nVertice)
+{
+	if (m_nAngle == 0)
+		return m_vCoordinates[nVertice];
+	else
+		return m_vAngleReturnCoordinates[nVertice];
 }
 
 void CEllipse::SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate)
@@ -161,7 +144,29 @@ void CEllipse::UpdateCoordinate(int nVertice)
 	NewCoordinates(m_xHalfLength, m_yHalfLength);
 }
 
-CPoint CEllipse::GetVertice(int nVertice)
+void CEllipse::NewCoordinates(int xHalfLength, int yHalfLength)
 {
-	return m_vAngleReturnCoordinates[nVertice];
+	m_vCoordinates[0] = CPoint(m_CenterCoordinates.x - xHalfLength * 3 / 4, m_CenterCoordinates.y - yHalfLength);
+	m_vCoordinates[1] = CPoint(m_CenterCoordinates.x - xHalfLength * 3 / 4, m_CenterCoordinates.y + yHalfLength);
+	m_vCoordinates[2] = CPoint(m_CenterCoordinates.x + xHalfLength * 3 / 4, m_CenterCoordinates.y + yHalfLength);
+	m_vCoordinates[3] = CPoint(m_CenterCoordinates.x + xHalfLength * 3 / 4, m_CenterCoordinates.y - yHalfLength);
+	
+	m_vAngleReturnCoordinates[0] = RotatePoint(-m_xHalfLength * 3 / 4, -m_yHalfLength);
+	m_vAngleReturnCoordinates[1] = RotatePoint(-m_xHalfLength * 3 / 4, m_yHalfLength);
+	m_vAngleReturnCoordinates[2] = RotatePoint(m_xHalfLength * 3 / 4, m_yHalfLength);
+	m_vAngleReturnCoordinates[3] = RotatePoint(m_xHalfLength * 3 / 4, -m_yHalfLength);
+	for (int i = 0; i < 4; i++)
+	{
+		m_vAngleReturnCoordinates[i] = CPoint(m_CenterCoordinates.x + m_vAngleReturnCoordinates[i].x,
+			m_CenterCoordinates.y + m_vAngleReturnCoordinates[i].y);
+	}
+
+
+	m_vDrawCoordinates[0] = CPoint(m_CenterCoordinates.x, m_CenterCoordinates.y - yHalfLength);
+	m_vDrawCoordinates[1] = CPoint(m_CenterCoordinates.x - xHalfLength, m_CenterCoordinates.y - yHalfLength);
+	m_vDrawCoordinates[2] = CPoint(m_CenterCoordinates.x - xHalfLength, m_CenterCoordinates.y + yHalfLength);
+	m_vDrawCoordinates[3] = CPoint(m_CenterCoordinates.x, m_CenterCoordinates.y + yHalfLength);
+	m_vDrawCoordinates[4] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y + yHalfLength);
+	m_vDrawCoordinates[5] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y - yHalfLength);
+	m_vDrawCoordinates[6] = CPoint(m_CenterCoordinates.x, m_CenterCoordinates.y - yHalfLength);
 }

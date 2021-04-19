@@ -7,9 +7,12 @@ protected:
 
 public:
 	CNameID(CString strName, unsigned int nID);
+	virtual ~CNameID();
+
 	CString GetName();
-	void SetName(CString name);
 	unsigned int GetID();
+
+	void SetName(CString name);
 	void SetID(unsigned int id);
 };
 

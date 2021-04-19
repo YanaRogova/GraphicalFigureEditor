@@ -6,41 +6,28 @@ CRectangle::CRectangle(int nPenStyle, int nPenWidth, COLORREF crPenColor,
 	CFigure(FIGURE_RECTANGLE, nPenStyle, nPenWidth, crPenColor,	nBrushStyle, crBrushColor, strName, id)
 {
 	m_nVertices = 4;
-	/*m_nPenStyle = nPenStyle;
-	m_nPenWidth = nPenWidth;
-	m_crPenColor = crPenColor;
-	m_nBrushStyle = nBrushStyle;
-	m_crBrushColor = crBrushColor;*/
 }
 
 CRectangle::~CRectangle()
 {
 }
 
-void CRectangle::NewCoordinates(int xHalfLength, int yHalfLength)
+void CRectangle::SetCoordinates(CPoint point)
 {
-	m_vCoordinates[0] = CPoint(m_CenterCoordinates.x - xHalfLength, m_CenterCoordinates.y - yHalfLength);
-	m_vCoordinates[1] = CPoint(m_CenterCoordinates.x - xHalfLength, m_CenterCoordinates.y + yHalfLength);
-	m_vCoordinates[2] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y + yHalfLength);
-	m_vCoordinates[3] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y - yHalfLength);
-}
+	CFigure::SetCoordinates(point);
 
-CPoint CRectangle::GetVertice(int nVertice)
-{
-	return m_vCoordinates[nVertice];
+	NewCoordinates(m_xHalfLength, m_yHalfLength);
+	m_bCanDraw = TRUE;
 }
 
 void CRectangle::DrawFigure(CDC* pDC)
 {
-	/*HWND hwnd =  FindWindow(L"CGraphicalWindow", L"m_GraphicalWindow");
-	PAINTSTRUCT ps;*/
 	pDC->SelectObject(m_ptrBrush);
 	pDC->SelectObject(m_ptrPen);
 
 	HDC hdc = static_cast<HDC>(*pDC);
 	SetBkMode(hdc, TRANSPARENT);
 	CPoint tempCoordinates[4];
-	
 
 	if (m_nAngle == 0)
 	{
@@ -51,7 +38,6 @@ void CRectangle::DrawFigure(CDC* pDC)
 		}
 		pDC->Polygon(&tempCoordinates[0], 4);
 	}
-		
 	else
 	{
 		Rotate();
@@ -78,23 +64,15 @@ void CRectangle::Rotate()
 	}
 }
 
-void CRectangle::SetCoordinates(CPoint point)
-{
-	CFigure::SetCoordinates(point);
-
-	NewCoordinates(m_xHalfLength, m_yHalfLength);
-	m_bCanDraw = TRUE;
-}
-
 CString CRectangle::GetStrCoordinates()
 {
 	CString str;
-	if(m_nAngle == 0 || m_bReturnNotRotateCoordinates)
-		str.Format(L"{(%d, %d), (%d, %d), (%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x, 
-		m_vCoordinates[1].y, m_vCoordinates[2].x, m_vCoordinates[2].y, m_vCoordinates[3].x, m_vCoordinates[3].y);
+	if (m_nAngle == 0 || m_bReturnNotRotateCoordinates)
+		str.Format(L"{(%d, %d), (%d, %d), (%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x,
+			m_vCoordinates[1].y, m_vCoordinates[2].x, m_vCoordinates[2].y, m_vCoordinates[3].x, m_vCoordinates[3].y);
 	else
-		str.Format(L"{(%d, %d), (%d, %d), (%d, %d), (%d, %d)}", m_vAngleCoordinates[0].x, m_vAngleCoordinates[0].y, 
-			m_vAngleCoordinates[1].x, m_vAngleCoordinates[1].y, m_vAngleCoordinates[2].x, m_vAngleCoordinates[2].y, 
+		str.Format(L"{(%d, %d), (%d, %d), (%d, %d), (%d, %d)}", m_vAngleCoordinates[0].x, m_vAngleCoordinates[0].y,
+			m_vAngleCoordinates[1].x, m_vAngleCoordinates[1].y, m_vAngleCoordinates[2].x, m_vAngleCoordinates[2].y,
 			m_vAngleCoordinates[3].x, m_vAngleCoordinates[3].y);
 	return str;
 }
@@ -105,6 +83,14 @@ CPoint* CRectangle::GetCoordinates()
 		return m_vCoordinates;
 	else
 		return m_vAngleCoordinates;
+}
+
+CPoint CRectangle::GetVertice(int nVertice)
+{
+	if (m_nAngle == 0)
+		return m_vCoordinates[nVertice];
+	else
+		return m_vAngleCoordinates[nVertice];
 }
 
 void CRectangle::SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate)
@@ -162,10 +148,7 @@ void CRectangle::SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate)
 			}
 			break;
 		}
-		//m_vCoordinates[nVertice].y = nCoordinate;
 	}
-	/*if (m_nAngle != 0)
-		UpdateCoordinate(nVertice);*/
 }
 
 void CRectangle::UpdateCoordinate(int nVertice)
@@ -179,4 +162,12 @@ void CRectangle::UpdateCoordinate(int nVertice)
 	m_nAngle *= -1;
 	SetCoordinates(CPoint());
 	NewCoordinates(m_xHalfLength, m_yHalfLength);
+}
+
+void CRectangle::NewCoordinates(int xHalfLength, int yHalfLength)
+{
+	m_vCoordinates[0] = CPoint(m_CenterCoordinates.x - xHalfLength, m_CenterCoordinates.y - yHalfLength);
+	m_vCoordinates[1] = CPoint(m_CenterCoordinates.x - xHalfLength, m_CenterCoordinates.y + yHalfLength);
+	m_vCoordinates[2] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y + yHalfLength);
+	m_vCoordinates[3] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y - yHalfLength);
 }

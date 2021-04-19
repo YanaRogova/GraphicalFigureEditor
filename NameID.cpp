@@ -7,19 +7,23 @@ CNameID::CNameID(CString strName, unsigned int nID)
 	m_nID = nID;
 }
 
+CNameID::~CNameID()
+{
+}
+
 CString CNameID::GetName()
 {
 	return m_strName;
 }
 
-void CNameID::SetName(CString name)
-{
-	m_strName = name;
-}
-
 unsigned int CNameID::GetID()
 {
 	return m_nID;
+}
+
+void CNameID::SetName(CString name)
+{
+	m_strName = name;
 }
 
 void CNameID::SetID(unsigned int id)

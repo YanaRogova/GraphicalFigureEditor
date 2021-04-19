@@ -77,6 +77,37 @@
 #define ID_PICTURE_RESIZE32775          32775
 #define ID_PICTURE_CLEAR                32776
 
+
+//to CEditorView
+#define ID_BUT_RECTANGLE		1300
+#define ID_OUTPUT_WINDOW		1301
+#define ID_BUT_ELLIPSE			1302
+#define ID_CBOX_PEN_STYLES		1303
+#define ID_ED_PEN_WIDTH			1304
+#define ID_BUT_PEN_COLOR		1305
+#define ID_BUT_BRUSH_COLOR		1306
+#define ID_CBOX_BRUSH_STYLES	1307
+#define ID_BUT_NORM_FIGURE		1308
+#define ID_ED_FIGURE_ANGLE		1309
+#define ID_BUT_LEFT_ROTATE		1310
+#define ID_BUT_RIGHT_ROTATE		1311
+#define ID_BUT_MOVE				1312
+#define ID_BUT_TRIANGLE			1313
+#define ID_FIGURE_LIST			1315
+#define ID_BUT_DELETE			1316
+#define ID_STATIC				1317
+#define ID_ED_NAME				1318
+#define ID_ED_ID				1319
+#define ID_DLG_FIGURE			1320
+#define ID_BUT_LINK				1321
+#define ID_BUT_CREATE			1322
+#define ID_CBOX_FIRST_FIGURE	1323
+#define ID_CBOX_SECOND_FIGURE	1324
+#define ID_CBOX_LINK_DIRECTION	1325
+#define ID_VSCROLLBAR			1326
+#define ID_HSCROLLBAR			1327
+
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

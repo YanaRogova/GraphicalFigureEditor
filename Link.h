@@ -6,21 +6,22 @@ public:
 	CLink(int nPenStyle, int nPenWidth, COLORREF crPenColor, CString strfirstFigure, CString strsecondFigure, int nDirection,
 		CPoint nFirstPoint, CPoint nSecondPoint, CString strName, unsigned int id);
 	~CLink();
-	//void CLink::NewCoordinates(int xHalfLength, int yHalfLength);
-	void PaintArrow(CPoint startPoint, CPoint endPoint, CDC* pDC);
+
 	void DrawFigure(CDC* pDC);
+
 	void SetVertice(int nNumberVertice, CPoint point);
+	void SetFigure(CString strFigure, bool bFirstSecond);
+	void SetPen();
+	void SetDirection(int nDirection);
+
+	CPoint GetVertice(int nVertice);
 	CString GetFirstFigure();
 	CString GetSecondFigure();
-	void SetFigure(CString strFigure, bool bFirstSecond);
-	CPoint GetVertice(int nVertice);
-	void SetPen();
+	CPoint* CLink::GetCoordinates();
 	CString GetStrCoordinates();
 	CString GetStrCenter();
 	CString GetAngle();
 	int GetDirection();
-	void SetDirection(int nDirection);
-	CPoint* CLink::GetCoordinates();
 
 protected:
 	int m_nVertices;
@@ -30,5 +31,6 @@ protected:
 	int m_nDirection;
 
 	double GetArrowAngle(double fw, double fh);
+	void PaintArrow(CPoint startPoint, CPoint endPoint, CDC* pDC);
 };
 

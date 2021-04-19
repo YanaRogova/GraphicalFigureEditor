@@ -2,38 +2,33 @@
 #include "Figure.h"
 class CEllipse : public CFigure
 {
-protected:
-	virtual void NewCoordinates(int xHalfLength, int yHalfLength);
 public:
-
 	CEllipse(int nPenStyle, int nPenWidth, COLORREF crPenColor,
 		int nBrushStyle, COLORREF crBrushColor, CString strName, unsigned int id);
 	virtual ~CEllipse();
-	virtual void SetCoordinates(CPoint point);
-	virtual void DrawFigure(CDC* pDC);
-	//virtual void Resize(bool bMoreLess);
-	virtual void Normalize();
-	virtual void Rotate();
-	CString GetStrCoordinates();
-	CPoint* GetCoordinates();
-	CPoint GetVertice(int nVertice);
 
-	void SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate);
-	void UpdateCoordinate(int nVertice);
+	void SetCoordinates(CPoint point) override;
+	void DrawFigure(CDC* pDC) override;
+	void Normalize() override;
+	void Rotate() override;
+	CString GetStrCoordinates() override;
+	CPoint* GetCoordinates() override;
+	CPoint GetVertice(int nVertice) override;
+
+	void SetDlgCoordinate(int nVertice, bool bXOrY, int nCoordinate) override;
+	void UpdateCoordinate(int nVertice) override;
+
+protected:
+	void NewCoordinates(int xHalfLength, int yHalfLength) override;
 
 protected:
 	int m_nVertices;
 	bool bNormalised;
-	//bool m_bCanDraw;
-	//int m_nAngle;
-	//bool bLeftRightRotate;
+
 public:
 	CPoint m_vCoordinates[4];
 	CPoint m_vAngleReturnCoordinates[4];
 	CPoint m_vDrawCoordinates[7];
 	CPoint m_vAngleCoordinates[7];
-	//CPoint m_CenterCoordinates;
-	//double m_xHalfLength;
-	//double m_yHalfLength;
 };
 

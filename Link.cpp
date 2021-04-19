@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Link.h"
-
 #include "GraphicalWindow.h"
 
 CLink::CLink(int nPenStyle, int nPenWidth, COLORREF crPenColor, CString strfirstFigure, CString strsecondFigure, 
@@ -19,7 +18,100 @@ CLink::CLink(int nPenStyle, int nPenWidth, COLORREF crPenColor, CString strfirst
 
 CLink::~CLink()
 {
+}
 
+void CLink::DrawFigure(CDC* pDC)
+{
+	pDC->SelectObject(m_ptrBrush);
+	pDC->SelectObject(m_ptrPen);
+	CPoint tempCoordinates[2];
+	for (int i = 0; i < m_nVertices; i++)
+	{
+		tempCoordinates[i].x = m_vCoordinates[i].x + m_HScrollPosition;
+		tempCoordinates[i].y = m_vCoordinates[i].y + m_VScrollPosition;
+	}
+
+	pDC->MoveTo(tempCoordinates[0]);
+	pDC->LineTo(tempCoordinates[1]);
+
+	CPen ArrowPen;
+	ArrowPen.CreatePen(PS_SOLID | PS_GEOMETRIC, m_nPenWidth, m_crPenColor);
+	pDC->SelectObject(&ArrowPen);
+	if (m_nDirection == 2 || m_nDirection == 3)
+		PaintArrow(tempCoordinates[0], tempCoordinates[1], pDC);
+	if (m_nDirection == 1 || m_nDirection == 3)
+		PaintArrow(tempCoordinates[1], tempCoordinates[0], pDC);
+	pDC->SelectObject(m_ptrPen);
+}
+
+void CLink::SetVertice(int nNumberVertice, CPoint point)
+{
+	m_vCoordinates[nNumberVertice] = point;
+}
+
+void CLink::SetFigure(CString strFigure, bool bFirstSecond)
+{
+	if (bFirstSecond)
+		m_strFirstFigure = strFigure;
+	else
+		m_strSecondFigure = strFigure;
+}
+
+void CLink::SetPen()
+{
+	CFigure::SetPen();
+	m_crBrushColor = m_crPenColor;
+	delete m_ptrBrush;
+	m_ptrBrush = nullptr;
+	SetBrush();
+}
+
+void CLink::SetDirection(int nDirection)
+{
+	m_nDirection = nDirection;
+}
+
+CPoint CLink::GetVertice(int nVertice)
+{
+	return m_vCoordinates[nVertice];
+}
+
+CString CLink::GetFirstFigure()
+{
+	return m_strFirstFigure;
+}
+
+CString CLink::GetSecondFigure()
+{
+	return m_strSecondFigure;
+}
+
+CPoint* CLink::GetCoordinates()
+{
+	return m_vCoordinates;
+}
+
+CString CLink::GetStrCoordinates()
+{
+	CString str;
+	str.Format(L"{(%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x,
+		m_vCoordinates[1].y);
+	return str;
+}
+
+CString CLink::GetStrCenter()
+{
+	return L"-";
+}
+
+CString CLink::GetAngle()
+{
+	return L"-";
+}
+
+int CLink::GetDirection()
+{
+	return m_nDirection;
 }
 
 double CLink::GetArrowAngle(double fw, double fh)
@@ -48,98 +140,3 @@ void CLink::PaintArrow(CPoint startPoint, CPoint endPoint, CDC* pDC)
 	poly[1].y = (long)(endPoint.y + length * sin(angle * PI / 180));
 	pDC->Polygon(poly, 3);
 }
-
-void CLink::DrawFigure(CDC* pDC)
-{
-	pDC->SelectObject(m_ptrBrush);
-	pDC->SelectObject(m_ptrPen);
-	CPoint tempCoordinates[2];
-	for (int i = 0; i < m_nVertices; i++)
-	{
-		tempCoordinates[i].x = m_vCoordinates[i].x + m_HScrollPosition;
-		tempCoordinates[i].y = m_vCoordinates[i].y + m_VScrollPosition;
-	}
-
-	pDC->MoveTo(tempCoordinates[0]);
-	pDC->LineTo(tempCoordinates[1]);
-
-	CPen ArrowPen;
-	ArrowPen.CreatePen(PS_SOLID | PS_GEOMETRIC, m_nPenWidth, m_crPenColor);
-	pDC->SelectObject(&ArrowPen);
-	if(m_nDirection == 2 || m_nDirection == 3)
-		PaintArrow(tempCoordinates[0], tempCoordinates[1], pDC);
-	if (m_nDirection == 1 || m_nDirection == 3)
-		PaintArrow(tempCoordinates[1], tempCoordinates[0], pDC);
-	pDC->SelectObject(m_ptrPen);
-}
-
-CString CLink::GetFirstFigure()
-{
-	return m_strFirstFigure;
-}
-
-CString CLink::GetSecondFigure()
-{
-	return m_strSecondFigure;
-}
-
-void CLink::SetVertice(int nNumberVertice, CPoint point)
-{
-	m_vCoordinates[nNumberVertice] = point;
-}
-
-CPoint CLink::GetVertice(int nVertice)
-{
-	return m_vCoordinates[nVertice];
-}
-
-void CLink::SetFigure(CString strFigure, bool bFirstSecond)
-{
-	if (bFirstSecond)
-		m_strFirstFigure = strFigure;
-	else
-		m_strSecondFigure = strFigure;
-}
-
-void CLink::SetPen()
-{
-	CFigure::SetPen();
-	m_crBrushColor = m_crPenColor;
-	delete m_ptrBrush;
-	m_ptrBrush = nullptr;
-	SetBrush();
-}
-
-CString CLink::GetStrCoordinates()
-{
-	CString str;
-	str.Format(L"{(%d, %d), (%d, %d)}", m_vCoordinates[0].x, m_vCoordinates[0].y, m_vCoordinates[1].x,
-		m_vCoordinates[1].y);
-	return str;
-}
-
-CString CLink::GetStrCenter()
-{
-	return L"-";
-}
-
-CString CLink::GetAngle()
-{
-	return L"-";
-}
-
-int CLink::GetDirection()
-{
-	return m_nDirection;
-}
-
-CPoint* CLink::GetCoordinates()
-{
-	return m_vCoordinates;
-}
-
-void CLink::SetDirection(int nDirection)
-{
-	m_nDirection = nDirection;
-}
-

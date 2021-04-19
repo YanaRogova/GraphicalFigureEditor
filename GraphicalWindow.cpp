@@ -3,16 +3,21 @@
 #include "EditorView.h"
 #include <string>
 
-
 BEGIN_MESSAGE_MAP(CGraphicalWindow, CStatic)
 	ON_WM_PAINT()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEWHEEL()
-	/*ON_WM_VSCROLL()
-	ON_WM_HSCROLL()
-	ON_WM_SETCURSOR()*/
 END_MESSAGE_MAP()
+
+
+void CGraphicalWindow::PreCreateFigure()
+{
+	SetFigureNameAndID();
+	m_setNames.insert(m_FigureName);
+	m_setID.insert(m_FigureID);
+	m_bPictureNotSaved = TRUE;
+}
 
 CGraphicalWindow::CGraphicalWindow()
 {
@@ -36,214 +41,70 @@ CGraphicalWindow::~CGraphicalWindow()
 {
 }
 
-//void CGraphicalWindow::OnDraw(CDC* pDC)
-//{}
-
-void CGraphicalWindow::OnPaint()
+void CGraphicalWindow::SetFigureType(int nFigureType)
 {
-	CWnd::OnPaint();
-	CDC* pDCPaint = GetDC();
-	CMemDC memDC(*pDCPaint, this);
-	CDC* pDC = &memDC.GetDC();
-	CRect currentRect;
-	CRect rect;
+	m_nFigureType = nFigureType;
+}
+
+void CGraphicalWindow::UpdateList()
+{
 	CEditorView* pView = static_cast<CEditorView*>(GetParent());
-	//currentRect = pView->GetCurrentRect();
-	//CRect rect(-1, -1, pView->GetWidth() - 1, pView->GetHeight() - 1);
-	GetWindowRect(rect);
-	ScreenToClient(rect);
-	/*if (pView->GetHScrollPosition() != 0)
+	pView->UpdateListView(TRUE);
+	pView->m_dlgFigureProperties.SetData();
+}
+
+void CGraphicalWindow::SetFigureNameAndID()
+{
+	CEditorView* pView = static_cast<CEditorView*>(GetParent());
+	pView->OnEditName();
+	pView->OnEditID();
+}
+
+void CGraphicalWindow::MoveFigure(CPoint point)
+{
+	if (!m_Figure.empty())
 	{
-		rect.left += pView->GetHScrollPosition();
-		rect.right += pView->GetHScrollPosition();
-	}*/
-	
-	rect.DeflateRect(1, 1, 1, 1);
-	//pDC->OffsetWindowOrg(pView->GetHScrollPosition(), 0);
-	pDC->FillSolidRect(rect, RGB(255, 255, 255));
-	//pDC->
-	for (int i = 0; i < m_Figure.size(); i++)
-	{
-		if (m_Figure[i]->GetCanDraw())
-		{
-			m_Figure[i]->SetHScrollPosition(-pView->GetHScrollPosition());
-			m_Figure[i]->SetVScrollPosition(-pView->GetVScrollPosition());
-			m_Figure[i]->DrawFigure(pDC);
-		}
+		m_Figure[m_nSelectedFigure]->Move(point);
+		CEditorView* pView = static_cast<CEditorView*>(GetParent());
+		pView->m_dlgFigureProperties.SetData();
+		m_bPictureNotSaved = TRUE;
 	}
 }
 
-void CGraphicalWindow::PreCreateFigure()
+bool CGraphicalWindow::PictureNotSaved()
 {
-	SetFigureNameAndID();
-	m_setNames.insert(m_FigureName);
-	m_setID.insert(m_FigureID);
+	return m_bPictureNotSaved;
+}
+
+void CGraphicalWindow::SetPictureNotSaved(bool bNotSaved)
+{
+	m_bPictureNotSaved = bNotSaved;
+}
+
+void CGraphicalWindow::DeleteFigure()
+{
+	m_setID.erase(_wtoi(m_Figure[m_nSelectedFigure]->GetID()));
+	m_setNames.erase(m_Figure[m_nSelectedFigure]->GetName());
+	for (int i = 0; i < m_Figure.size(); i++)
+	{
+		if (m_Figure[i]->GetFigureType() == FIGURE_LINK)
+			if (m_Figure[i]->GetFirstFigure() == m_Figure[m_nSelectedFigure]->GetName() ||
+				m_Figure[i]->GetSecondFigure() == m_Figure[m_nSelectedFigure]->GetName())
+			{
+				m_setID.erase(_wtoi(m_Figure[i]->GetID()));
+				m_setNames.erase(m_Figure[i]->GetName());
+				m_Figure.erase(m_Figure.begin() + i);
+				i--;
+			}
+	}
+	m_Figure.erase(m_Figure.begin() + m_nSelectedFigure);
+
+	m_nSelectedFigure = 0;
+
 	m_bPictureNotSaved = TRUE;
 }
 
-void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	CEditorView* pView = static_cast<CEditorView*>(GetParent());
-
-	CPoint tempPoint;
-	tempPoint.x = point.x + pView->GetHScrollPosition();
-	tempPoint.y = point.y + pView->GetVScrollPosition();
-	int nNumberVertice;
-	if (m_bLButtonUp == TRUE)
-	{
-		if (m_bLButtonDown == FALSE || m_Figure.empty())
-		{
-			switch (m_nFigureType)
-			{
-			case FIGURE_ELLIPSE:
-				PreCreateFigure();
-				m_Figure.push_back(new CEllipse(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
-					BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
-				m_bFigureDone = FALSE;
-				break;
-
-			case FIGURE_RECTANGLE:
-				PreCreateFigure();
-				m_Figure.push_back(new CRectangle(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
-					BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
-				m_bFigureDone = FALSE;
-				break;
-
-			case FIGURE_TRIANGLE:
-				if (m_Figure.empty())
-				{
-					PreCreateFigure();
-					m_Figure.push_back(new CTriangle(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
-						BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
-				}
-					
-				else
-				{
-					nNumberVertice = m_Figure[m_Figure.size() - 1]->GetNumberVertices();
-					if (nNumberVertice == 3 || nNumberVertice == -1)
-					{
-						PreCreateFigure();
-						m_Figure.push_back(new CTriangle(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
-							BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
-
-					}
-						
-				}
-
-				m_bFigureDone = FALSE;
-				break;
-			}
-		}
-		
-		m_bPaintNow = FALSE;
-		switch (m_nFigureType) 
-		{
-		case FIGURE_ELLIPSE:
-		case FIGURE_RECTANGLE:
-			m_Figure[m_Figure.size() - 1]->m_vCoordinates[0] = tempPoint;
-			m_bFigureDone = TRUE;
-			break;
-
-		case FIGURE_TRIANGLE:
-			nNumberVertice = m_Figure[m_Figure.size() - 1]->GetNumberVertices();
-
-			if (nNumberVertice < 3)
-			{
-				m_Figure[m_Figure.size() - 1]->SetVertice(nNumberVertice, tempPoint);
-			}
-			break;
-
-		case FIGURE_MOVE:
-			if (!m_bFigureDone)
-			{
-				m_setID.erase(_wtoi(m_Figure[m_Figure.size() - 1]->GetID()));
-				m_setNames.erase(m_Figure[m_Figure.size() - 1]->GetName());
-				m_Figure.pop_back();
-				m_bFigureDone = TRUE;
-			}
-			MoveFigure(tempPoint);
-			pView->UpdateLinks(m_nSelectedFigure);
-			UpdateList();
-			break;
-		}
-			//SetTimer(ID_TIMER, 10000, NULL);
-	}
-
-	m_bLButtonDown = TRUE;
-	m_bLButtonUp = FALSE;
-}
-
-void CGraphicalWindow::OnLButtonUp(UINT nFlags, CPoint point)
-{
-	CEditorView* pView = static_cast<CEditorView*>(GetParent());
-
-	CPoint tempPoint;
-	tempPoint.x = point.x + pView->GetHScrollPosition();
-	tempPoint.y = point.y + pView->GetVScrollPosition();
-	if (m_nFigureType >= 0 && m_bLButtonUp == FALSE && m_bLButtonDown == TRUE)
-	{
-		switch (m_nFigureType) {
-		case FIGURE_ELLIPSE:
-		case FIGURE_RECTANGLE:
-			if (tempPoint != m_Figure[m_Figure.size() - 1]->m_vCoordinates[0])
-			{
-				m_nSelectedFigure = m_Figure.size() - 1;
-				m_Figure[m_nSelectedFigure]->SetCoordinates(tempPoint);
-			}
-			else
-			{
-				m_setID.erase(_wtoi(m_Figure[m_Figure.size() - 1]->GetID()));
-				m_setNames.erase(m_Figure[m_Figure.size() - 1]->GetName());
-				m_Figure.pop_back();
-			}
-				
-			UpdateList();
-			//m_nFigureType = -1;
-			break;
-		case FIGURE_TRIANGLE:
-			if (m_Figure[m_Figure.size() - 1]->GetNumberVertices() == 3)
-			{
-				m_nSelectedFigure = m_Figure.size() - 1;
-				m_Figure[m_nSelectedFigure]->SetCoordinates(tempPoint);
-				UpdateList();
-				m_bFigureDone = TRUE;
-				//SetFigureNameAndID();
-			}
-			break;
-		}
-		Invalidate();
-		//KillTimer(ID_TIMER);
-		//m_bPaintNow = FALSE;
-		m_bLButtonDown = FALSE;
-	}
-
-	m_bLButtonUp = TRUE;
-	m_bPaintNow = TRUE;
-}
-
-void CGraphicalWindow::CStringToFile(CString &string, CFile& file)
-{
-	std::wstring wstrNewString = string;
-	std::string strNewString(wstrNewString.begin(), wstrNewString.end());
-	strNewString += "\n";
-	file.Write(strNewString.c_str(), strNewString.length());
-}
-
-void CGraphicalWindow::NumberToFile(int& num, CFile& file)
-{
-	std::string strNewString = std::to_string(num);
-	strNewString += "\n";
-	file.Write(strNewString.c_str(), strNewString.length());
-}
-
-void CGraphicalWindow::NumberToFile(unsigned long& num, CFile& file)
-{
-	std::string strNewString = std::to_string(num);
-	strNewString += "\n";
-	file.Write(strNewString.c_str(), strNewString.length());
-}
-
-void CGraphicalWindow::SaveElement(int nNumberElement, CFile &file)
+void CGraphicalWindow::SaveElement(int nNumberElement, CFile& file)
 {
 	int strFigure = m_Figure[nNumberElement]->GetFigureType();
 	NumberToFile(strFigure, file);
@@ -297,7 +158,29 @@ void CGraphicalWindow::SaveElement(int nNumberElement, CFile &file)
 
 		if (strFigure == FIGURE_RECTANGLE || strFigure == FIGURE_ELLIPSE)
 			nEndIndex = strNewString.find("(", nEndIndex) + 1;
-	}	
+	}
+}
+
+void CGraphicalWindow::CStringToFile(CString& string, CFile& file)
+{
+	std::wstring wstrNewString = string;
+	std::string strNewString(wstrNewString.begin(), wstrNewString.end());
+	strNewString += "\n";
+	file.Write(strNewString.c_str(), strNewString.length());
+}
+
+void CGraphicalWindow::NumberToFile(int& num, CFile& file)
+{
+	std::string strNewString = std::to_string(num);
+	strNewString += "\n";
+	file.Write(strNewString.c_str(), strNewString.length());
+}
+
+void CGraphicalWindow::NumberToFile(unsigned long& num, CFile& file)
+{
+	std::string strNewString = std::to_string(num);
+	strNewString += "\n";
+	file.Write(strNewString.c_str(), strNewString.length());
 }
 
 void CGraphicalWindow::SavePicture(CString strFileName)
@@ -315,6 +198,32 @@ void CGraphicalWindow::SavePicture(CString strFileName)
 	}
 	FilePicture.Close();
 	m_bPictureNotSaved = FALSE;
+}
+
+void CGraphicalWindow::OpenPicture(CString strFileName)
+{
+	CEditorView* pView = static_cast<CEditorView*>(GetParent());
+	m_nSelectedFigure = -1;
+	CStdioFile FilePicture;
+	FilePicture.Open(strFileName, CFile::modeRead);
+	bool bEndFile = FALSE;
+	CString string;
+	FilePicture.ReadString(string);
+	int n_Width = _wtoi(string);
+	FilePicture.ReadString(string);
+	pView->SetWidthAndHeight(n_Width, _wtoi(string));
+	pView->NewFile(FALSE);
+	m_setID.clear();
+	m_setNames.clear();
+	m_Figure.clear();
+	while (!bEndFile)
+	{
+		bEndFile = CreateElement(FilePicture);
+	}
+	FilePicture.Close();
+	m_nSelectedFigure = m_Figure.size() - 1;
+	OnPaint();
+	UpdateList();
 }
 
 bool CGraphicalWindow::CreateElement(CStdioFile& file)
@@ -370,7 +279,7 @@ bool CGraphicalWindow::CreateElement(CStdioFile& file)
 		file.ReadString(string);
 		point2.y = _wtoi(string);
 	}
-	
+
 	SetFigureNameAndID();
 	m_setNames.insert(strName);
 	m_setID.insert(nID);
@@ -383,7 +292,7 @@ bool CGraphicalWindow::CreateElement(CStdioFile& file)
 		m_bFigureDone = TRUE;
 		m_Figure[m_nSelectedFigure]->SetCoordinates(point1);
 		break;
-		
+
 	case FIGURE_ELLIPSE:
 		m_Figure.push_back(new CEllipse(nPenType, nPenWidth, crPenColor, nBrushType, crBrushColor, strName, nID));
 		m_Figure[m_nSelectedFigure]->m_vCoordinates[0] = point0;
@@ -410,37 +319,159 @@ bool CGraphicalWindow::CreateElement(CStdioFile& file)
 	pView->UpdateAngle(nAngle);
 }
 
-void CGraphicalWindow::OpenPicture(CString strFileName)
+void CGraphicalWindow::OnPaint()
 {
+	CWnd::OnPaint();
+	CDC* pDCPaint = GetDC();
+	CMemDC memDC(*pDCPaint, this);
+	CDC* pDC = &memDC.GetDC();
+	CRect currentRect;
+	CRect rect;
 	CEditorView* pView = static_cast<CEditorView*>(GetParent());
-	m_nSelectedFigure = -1;
-	CStdioFile FilePicture;
-	FilePicture.Open(strFileName, CFile::modeRead);
-	bool bEndFile = FALSE;
-	CString string;
-	FilePicture.ReadString(string);
-	int n_Width = _wtoi(string);
-	FilePicture.ReadString(string);
-	//int n_Height = _wtoi(string);
-	pView->SetWidthAndHeight(n_Width, _wtoi(string));
-	pView->NewFile(FALSE);
-	m_setID.clear();
-	m_setNames.clear();
-	m_Figure.clear();
-	while (!bEndFile)
-	{
-		bEndFile = CreateElement(FilePicture);
-	}
-	FilePicture.Close();
-	m_nSelectedFigure = m_Figure.size() - 1;
-	OnPaint();
-	UpdateList();
+	GetWindowRect(rect);
+	ScreenToClient(rect);
 
+	rect.DeflateRect(1, 1, 1, 1);
+	pDC->FillSolidRect(rect, RGB(255, 255, 255));
+	for (int i = 0; i < m_Figure.size(); i++)
+	{
+		if (m_Figure[i]->GetCanDraw())
+		{
+			m_Figure[i]->SetHScrollPosition(-pView->GetHScrollPosition());
+			m_Figure[i]->SetVScrollPosition(-pView->GetVScrollPosition());
+			m_Figure[i]->DrawFigure(pDC);
+		}
+	}
 }
 
-void CGraphicalWindow::SetFigureType(int nFigureType)
+
+void CGraphicalWindow::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	m_nFigureType = nFigureType;
+	CEditorView* pView = static_cast<CEditorView*>(GetParent());
+
+	CPoint tempPoint;
+	tempPoint.x = point.x + pView->GetHScrollPosition();
+	tempPoint.y = point.y + pView->GetVScrollPosition();
+	int nNumberVertice;
+	if (m_bLButtonUp == TRUE)
+	{
+		if (m_bLButtonDown == FALSE || m_Figure.empty())
+		{
+			switch (m_nFigureType)
+			{
+			case FIGURE_ELLIPSE:
+				PreCreateFigure();
+				m_Figure.push_back(new CEllipse(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
+					BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
+				m_bFigureDone = FALSE;
+				break;
+
+			case FIGURE_RECTANGLE:
+				PreCreateFigure();
+				m_Figure.push_back(new CRectangle(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
+					BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
+				m_bFigureDone = FALSE;
+				break;
+
+			case FIGURE_TRIANGLE:
+				if (m_Figure.empty())
+				{
+					PreCreateFigure();
+					m_Figure.push_back(new CTriangle(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
+						BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
+				}
+				else
+				{
+					nNumberVertice = m_Figure[m_Figure.size() - 1]->GetNumberVertices();
+					if (nNumberVertice == 3 || nNumberVertice == -1)
+					{
+						PreCreateFigure();
+						m_Figure.push_back(new CTriangle(PenStyles[m_nFigurePenStyles], m_nFigurePenWidth, m_crFigurePenColor,
+							BrushStyles[m_nFigureBrushStyles], m_crFigureBrushColor, m_FigureName, m_FigureID));
+					}
+				}
+				m_bFigureDone = FALSE;
+				break;
+			}
+		}
+		
+		m_bPaintNow = FALSE;
+		switch (m_nFigureType) 
+		{
+		case FIGURE_ELLIPSE:
+		case FIGURE_RECTANGLE:
+			m_Figure[m_Figure.size() - 1]->m_vCoordinates[0] = tempPoint;
+			m_bFigureDone = TRUE;
+			break;
+
+		case FIGURE_TRIANGLE:
+			nNumberVertice = m_Figure[m_Figure.size() - 1]->GetNumberVertices();
+			if (nNumberVertice < 3)
+			{
+				m_Figure[m_Figure.size() - 1]->SetVertice(nNumberVertice, tempPoint);
+			}
+			break;
+
+		case FIGURE_MOVE:
+			if (!m_bFigureDone)
+			{
+				m_setID.erase(_wtoi(m_Figure[m_Figure.size() - 1]->GetID()));
+				m_setNames.erase(m_Figure[m_Figure.size() - 1]->GetName());
+				m_Figure.pop_back();
+				m_bFigureDone = TRUE;
+			}
+			MoveFigure(tempPoint);
+			pView->UpdateLinks(m_nSelectedFigure);
+			UpdateList();
+			break;
+		}
+	}
+
+	m_bLButtonDown = TRUE;
+	m_bLButtonUp = FALSE;
+}
+
+void CGraphicalWindow::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	CEditorView* pView = static_cast<CEditorView*>(GetParent());
+
+	CPoint tempPoint;
+	tempPoint.x = point.x + pView->GetHScrollPosition();
+	tempPoint.y = point.y + pView->GetVScrollPosition();
+	if (m_nFigureType >= 0 && m_bLButtonUp == FALSE && m_bLButtonDown == TRUE)
+	{
+		switch (m_nFigureType) {
+		case FIGURE_ELLIPSE:
+		case FIGURE_RECTANGLE:
+			if (tempPoint != m_Figure[m_Figure.size() - 1]->m_vCoordinates[0])
+			{
+				m_nSelectedFigure = m_Figure.size() - 1;
+				m_Figure[m_nSelectedFigure]->SetCoordinates(tempPoint);
+			}
+			else
+			{
+				m_setID.erase(_wtoi(m_Figure[m_Figure.size() - 1]->GetID()));
+				m_setNames.erase(m_Figure[m_Figure.size() - 1]->GetName());
+				m_Figure.pop_back();
+			}
+			UpdateList();
+			break;
+		case FIGURE_TRIANGLE:
+			if (m_Figure[m_Figure.size() - 1]->GetNumberVertices() == 3)
+			{
+				m_nSelectedFigure = m_Figure.size() - 1;
+				m_Figure[m_nSelectedFigure]->SetCoordinates(tempPoint);
+				UpdateList();
+				m_bFigureDone = TRUE;
+			}
+			break;
+		}
+		Invalidate();
+		m_bLButtonDown = FALSE;
+	}
+
+	m_bLButtonUp = TRUE;
+	m_bPaintNow = TRUE;
 }
 
 BOOL CGraphicalWindow::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
@@ -459,64 +490,4 @@ BOOL CGraphicalWindow::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
 	}
 	return 1;
 
-}
-
-void CGraphicalWindow::UpdateList()
-{
-	//CWnd* = GetParent();
-	CEditorView* pView = static_cast<CEditorView*>(GetParent());
-	pView->UpdateListView(TRUE);
-	pView->m_dlgFigureProperties.SetData();
-}
-
-void CGraphicalWindow::SetFigureNameAndID()
-{
-	CEditorView* pView = static_cast<CEditorView*>(GetParent());
-	pView->OnEditName();
-	pView->OnEditID();
-}
-
-void CGraphicalWindow::MoveFigure(CPoint point)
-{
-	if (!m_Figure.empty())
-	{
-		m_Figure[m_nSelectedFigure]->Move(point);
-		CEditorView* pView = static_cast<CEditorView*>(GetParent());
-		pView->m_dlgFigureProperties.SetData();
-		m_bPictureNotSaved = TRUE;
-	}
-}
-
-bool CGraphicalWindow::PictureNotSaved()
-{
-	return m_bPictureNotSaved;
-}
-
-void CGraphicalWindow::SetPictureNotSaved(bool bNotSaved)
-{
-	m_bPictureNotSaved = bNotSaved;
-}
-
-
-void CGraphicalWindow::DeleteFigure()
-{
-	m_setID.erase(_wtoi(m_Figure[m_nSelectedFigure]->GetID()));
-	m_setNames.erase(m_Figure[m_nSelectedFigure]->GetName());
-	for (int i = 0; i < m_Figure.size(); i++)
-	{
-		if (m_Figure[i]->GetFigureType() == FIGURE_LINK)
-			if (m_Figure[i]->GetFirstFigure() == m_Figure[m_nSelectedFigure]->GetName() ||
-				m_Figure[i]->GetSecondFigure() == m_Figure[m_nSelectedFigure]->GetName())
-			{
-				m_setID.erase(_wtoi(m_Figure[i]->GetID()));
-				m_setNames.erase(m_Figure[i]->GetName());
-				m_Figure.erase(m_Figure.begin() + i);
-				i--;
-			}
-	}
-	m_Figure.erase(m_Figure.begin() + m_nSelectedFigure);
-
-	m_nSelectedFigure = 0;
-
-	m_bPictureNotSaved = TRUE;
 }
