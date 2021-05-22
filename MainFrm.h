@@ -10,6 +10,10 @@ public:
 
 protected: 
 	DECLARE_DYNAMIC(CMainFrame)
+	bool m_bFileExist;
+	bool m_bDeletePicture;
+	bool m_bCloseProgram;
+	CString m_sFileName;
 
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
@@ -19,9 +23,11 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void OnFileSaveAs();
+	afx_msg void OnFileSave();
 	afx_msg void OnFileOpen();
 	afx_msg void OnResize();
 	afx_msg void OnClose();
+	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
 
 public:

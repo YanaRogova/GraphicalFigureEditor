@@ -119,5 +119,14 @@
     <Image Include="res\GraphicalFigureEditor.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\about64.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\about.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\about.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

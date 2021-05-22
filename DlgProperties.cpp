@@ -35,6 +35,8 @@ BEGIN_MESSAGE_MAP(CDlgProperties, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO_SECOND_FIGURE, OnCBoxSecondFigure)
 	ON_COMMAND(IDC_BUT_SET_PEN, OnButSetPenColor)
 	ON_COMMAND(IDC_BUT_SET_BRUSH, OnButSetBrushColor)
+	ON_COMMAND(IDOK, OnOK)
+	ON_COMMAND(IDCANCEL, OnCancel)
 END_MESSAGE_MAP()
 
 CDlgProperties::CDlgProperties(CWnd* pParent) : CDialog(IDD_DLG_PROPERTIES, pParent)
@@ -520,4 +522,12 @@ HBRUSH CDlgProperties::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	}
 
 	return hBrush;
+}
+
+void CDlgProperties::OnOK()
+{
+}
+
+void CDlgProperties::OnCancel()
+{
 }

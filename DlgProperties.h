@@ -45,6 +45,8 @@ protected:
 
 	afx_msg void OnButSetPenColor();
 	afx_msg void OnButSetBrushColor();
+	afx_msg void OnOK() override;
+	afx_msg void OnCancel() override;
 
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 

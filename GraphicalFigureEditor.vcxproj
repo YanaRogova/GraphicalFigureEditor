@@ -229,6 +229,9 @@
     <None Include="res\GraphicalFigureEditor.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\about.bmp" />
+    <Image Include="res\about.png" />
+    <Image Include="res\about64.ico" />
     <Image Include="res\GraphicalFigureEditor.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

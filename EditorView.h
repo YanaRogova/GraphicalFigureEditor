@@ -20,7 +20,6 @@ public:
 	
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	void ShowMainElements();
 
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

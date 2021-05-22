@@ -73,32 +73,7 @@ BOOL CEditorView::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
-void CEditorView::ShowMainElements()
-{
-	m_ButRect.ShowWindow(SW_SHOW);
-	m_ButTriangle.ShowWindow(SW_SHOW);
-	m_ButEllipse.ShowWindow(SW_SHOW);
-	m_StaticName.ShowWindow(SW_SHOW);
-	m_EditName.ShowWindow(SW_SHOW);
-	m_StaticID.ShowWindow(SW_SHOW);
-	m_EditID.ShowWindow(SW_SHOW);
-	m_StaticPenWidth.ShowWindow(SW_SHOW);
-	m_EditPenWidth.ShowWindow(SW_SHOW);
-	m_StaticPenType.ShowWindow(SW_SHOW);
-	m_StaticBrush.ShowWindow(SW_SHOW);
-	m_CBoxPenStyles.ShowWindow(SW_SHOW);
-	m_CBoxBrushStyles.ShowWindow(SW_SHOW);
-	m_ButChousePenColor.ShowWindow(SW_SHOW);
-	m_ButChouseBrushColor.ShowWindow(SW_SHOW);
-	m_ButDelete.ShowWindow(SW_SHOW);
-	m_ButNormalizeFigure.ShowWindow(SW_SHOW);
-	m_ButMove.ShowWindow(SW_SHOW);
-	m_StaticAngle.ShowWindow(SW_SHOW);
-	m_EditFigureAngle.ShowWindow(SW_SHOW);
-	m_ButLeftRotate.ShowWindow(SW_SHOW);
-	m_ButRightRotate.ShowWindow(SW_SHOW);
-	m_List.ShowWindow(SW_SHOW);
-}
+
 
 int CEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
@@ -760,7 +735,7 @@ void CEditorView::NewFile(bool bChangePictureSize)
 	m_GraphicalWindow.MoveWindow(CRect(nCenterX - m_nWidth / 2, nCenterY - m_nHeight / 2, SecondCoordinate.x, SecondCoordinate.y));
 	m_HScrollbar.ShowWindow(SW_HIDE);
 	m_VScrollbar.ShowWindow(SW_HIDE);
-	ShowMainElements();
+
 	Invalidate();
 }
 

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Figure.h"
 
+#define RECTANGLE_VERTICES 4
+
 CFigure::CFigure(int nFigureType, int nPenStyle, int nPenWidth, COLORREF crPenColor,
 	int nBrushStyle, COLORREF crBrushColor, CString strName, unsigned int id) : 
 	m_figureNameID(strName, id)
@@ -371,3 +373,4 @@ void CFigure::NewCoordinates(int xHalfLength, int yHalfLength)
 	m_vCoordinates[2] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y + yHalfLength);
 	m_vCoordinates[3] = CPoint(m_CenterCoordinates.x + xHalfLength, m_CenterCoordinates.y - yHalfLength);
 }
+

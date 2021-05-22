@@ -89,7 +89,7 @@ public:
 	double m_yHalfLength;
 	void SetHScrollPosition(int nPosition);
 	void SetVScrollPosition(int nPosition);
-	
+
 };
 
 enum FigureType
