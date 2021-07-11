@@ -4,6 +4,7 @@
 #include "NameID.h"
 
 #define PI 3.14159265 
+#define VERTICES 4
 
 class CFigure
 {
@@ -82,8 +83,8 @@ protected:
 	CNameID m_figureNameID;
 
 public:
-	CPoint m_vCoordinates[4];
-	CPoint m_vAngleCoordinates[4];
+	CPoint m_vCoordinates[VERTICES];
+	CPoint m_vAngleCoordinates[VERTICES];
 	CPoint m_CenterCoordinates;
 	double m_xHalfLength;
 	double m_yHalfLength;

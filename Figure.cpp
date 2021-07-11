@@ -242,7 +242,7 @@ void CFigure::Rotate()
 	m_vAngleCoordinates[2] = RotatePoint(m_xHalfLength, m_yHalfLength);
 	m_vAngleCoordinates[3] = RotatePoint(m_xHalfLength, -m_yHalfLength);
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < VERTICES; i++)
 	{
 		m_vAngleCoordinates[i] = CPoint(m_CenterCoordinates.x - m_vAngleCoordinates[i].x,
 			m_CenterCoordinates.y - m_vAngleCoordinates[i].y);

@@ -24,7 +24,7 @@ protected:
 	int m_nVertices;
 
 public:
-	CPoint m_vCoordinates[4];
-	CPoint m_vAngleCoordinates[4];
+	CPoint m_vCoordinates[VERTICES];
+	CPoint m_vAngleCoordinates[VERTICES];
 };
 

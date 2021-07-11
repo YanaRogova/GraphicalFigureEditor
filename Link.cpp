@@ -9,7 +9,7 @@ CLink::CLink(int nPenStyle, int nPenWidth, COLORREF crPenColor, CString strfirst
 	m_strFirstFigure = strfirstFigure;
 	m_strSecondFigure = strsecondFigure;
 
-	m_nVertices = 2;
+	m_nVertices = LINK_VERTICES;
 	m_vCoordinates[0] = nFirstPoint;
 	m_vCoordinates[1] = nSecondPoint;
 	m_bCanDraw = TRUE;

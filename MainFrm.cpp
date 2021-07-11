@@ -9,6 +9,11 @@
 #define new DEBUG_NEW
 #endif
 
+#define WINDOW_SIZE 0.75
+#define ERROR_RESULT -1
+#define SUCCESS_RESULT 0
+
+
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
@@ -41,8 +46,8 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	if (!CFrameWnd::PreCreateWindow(cs))
 		return FALSE;
 
-	int nxSize = static_cast<int>(GetSystemMetrics(SM_CXMAXIMIZED) * 0.75);
-	int nySize = static_cast<int>(GetSystemMetrics(SM_CYMAXIMIZED) * 0.75);
+	int nxSize = static_cast<int>(GetSystemMetrics(SM_CXMAXIMIZED) * WINDOW_SIZE);
+	int nySize = static_cast<int>(GetSystemMetrics(SM_CYMAXIMIZED) * WINDOW_SIZE);
 	cs.cx = nxSize;
 	cs.cy = nySize;
 
@@ -64,21 +69,21 @@ BOOL CMainFrame::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO*
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
-		return -1;
+	if (CFrameWnd::OnCreate(lpCreateStruct) == ERROR_RESULT)
+		return ERROR_RESULT;
 
 	if (!m_wndView.Create(nullptr, nullptr, AFX_WS_DEFAULT_VIEW,
 		CRect(), this, AFX_IDW_PANE_FIRST, nullptr))
 	{
 		TRACE0("Failed to create view window\n");
-		return -1;
+		return ERROR_RESULT;
 	}
 
 	HICON hIcon = AfxGetApp()->LoadIcon(MAKEINTRESOURCE(IDR_MAINFRAME));
 	
 	SetIcon(hIcon, FALSE);
 	SetIcon(hIcon, TRUE);
-	return 0;
+	return SUCCESS_RESULT;
 }
 
 void CMainFrame::OnSetFocus(CWnd* /*pOldWnd*/)

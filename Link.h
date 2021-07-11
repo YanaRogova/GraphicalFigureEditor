@@ -1,5 +1,8 @@
 #pragma once
 #include "Figure.h"
+
+#define LINK_VERTICES 2
+
 class CLink : public CFigure
 {
 public:
@@ -25,7 +28,7 @@ public:
 
 protected:
 	int m_nVertices;
-	CPoint m_vCoordinates[2];
+	CPoint m_vCoordinates[LINK_VERTICES];
 	CString m_strFirstFigure;
 	CString m_strSecondFigure;
 	int m_nDirection;

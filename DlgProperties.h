@@ -1,6 +1,12 @@
 #pragma once
 #include <vector>
 
+#define ARRAY_RGB 3
+#define MAX_NUMBER_VERTICES 4
+#define NUMBER_LINK_CONTROLS 9
+#define NUMBER_DLG_CONTROLS 61
+
+
 class CDlgProperties : public CDialog
 {
 	DECLARE_DYNAMIC(CDlgProperties)
@@ -60,15 +66,16 @@ protected:
 
 	int m_nID;
 	int m_nAngle;
-	int m_nPenColor[3];
-	int m_nBrushColor[3];
+	int m_nPenColor[ARRAY_RGB];
+	int m_nBrushColor[ARRAY_RGB];
 	int m_nWidth;
 	int m_nDirection;
+
 	int m_nPenStyles;
 	int m_nBrushStyles;
 
 	CPoint m_Center;
-	CPoint m_Vertices[4];
+	CPoint m_Vertices[MAX_NUMBER_VERTICES];
 
 	CComboBox *m_ptrCBoxPenStyles;
 	CComboBox *m_ptrCBoxBrushStyles;
@@ -78,4 +85,5 @@ protected:
 	std::vector<int> FigureElements;
 
 	HBRUSH hbrush;
+
 };

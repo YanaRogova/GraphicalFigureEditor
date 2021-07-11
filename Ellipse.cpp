@@ -5,7 +5,7 @@ CEllipse::CEllipse(int nPenStyle, int nPenWidth, COLORREF crPenColor,
 	int nBrushStyle, COLORREF crBrushColor, CString strName, unsigned int id):
 	CFigure(FIGURE_ELLIPSE, nPenStyle, nPenWidth, crPenColor, nBrushStyle, crBrushColor, strName, id)
 {
-	m_nVertices = 7;
+	m_nVertices = ELLIPSE_DRAW_VERTICES;
 	bNormalised = FALSE;
 }
 
@@ -28,7 +28,7 @@ void CEllipse::DrawFigure(CDC* pDC)
 
 	pDC->SelectObject(m_ptrBrush);
 	pDC->SelectObject(m_ptrPen);
-	CPoint tempCoordinates[7];
+	CPoint tempCoordinates[ELLIPSE_DRAW_VERTICES];
 	if (!bNormalised)
 	{
 		if (m_nAngle == 0)
@@ -49,10 +49,10 @@ void CEllipse::DrawFigure(CDC* pDC)
 			}
 		}
 		pDC->BeginPath();
-		pDC->PolyBezier(tempCoordinates, 7);
+		pDC->PolyBezier(tempCoordinates, ELLIPSE_DRAW_VERTICES);
 		pDC->EndPath();
 		pDC->FillPath();
-		pDC->PolyBezier(tempCoordinates, 7);
+		pDC->PolyBezier(tempCoordinates, ELLIPSE_DRAW_VERTICES);
 	}
 	else
 	{
@@ -155,7 +155,7 @@ void CEllipse::NewCoordinates(int xHalfLength, int yHalfLength)
 	m_vAngleReturnCoordinates[1] = RotatePoint(-m_xHalfLength * 3 / 4, m_yHalfLength);
 	m_vAngleReturnCoordinates[2] = RotatePoint(m_xHalfLength * 3 / 4, m_yHalfLength);
 	m_vAngleReturnCoordinates[3] = RotatePoint(m_xHalfLength * 3 / 4, -m_yHalfLength);
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < VERTICES; i++)
 	{
 		m_vAngleReturnCoordinates[i] = CPoint(m_CenterCoordinates.x + m_vAngleReturnCoordinates[i].x,
 			m_CenterCoordinates.y + m_vAngleReturnCoordinates[i].y);

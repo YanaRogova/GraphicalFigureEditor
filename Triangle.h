@@ -1,5 +1,8 @@
 #pragma once
 #include "Figure.h"
+
+#define TRIANGLE_VERTICES 3
+
 class CTriangle : public CFigure
 {
 public:
@@ -29,10 +32,10 @@ protected:
 	int m_nVertices;
 	int m_nEnableVertices;
 	double m_dRadius;
-	double m_dAngle[3];
+	double m_dAngle[TRIANGLE_VERTICES];
 
 public:
-	CPoint m_vCoordinates[3];
-	CPoint m_vAngleCoordinates[3];
+	CPoint m_vCoordinates[TRIANGLE_VERTICES];
+	CPoint m_vAngleCoordinates[TRIANGLE_VERTICES];
 };
 

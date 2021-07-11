@@ -88,37 +88,30 @@ void CDlgProperties::SetData()
 
 	int nStateLink, nStateFigure;
 
+	std::vector<int> LinkIDC = { IDC_STATIC_VERTICLES , IDC_STATIC_X1 , IDC_STATIC_Y1 , IDC_VERTICES_X1 , IDC_VERTICES_Y1 ,
+		IDC_STATIC_X2 , IDC_STATIC_Y2 , IDC_VERTICES_X2 , IDC_VERTICES_Y2 };
+	std::vector<int> xLink = { 350 , 360 , 440 , 385 , 465 , 530 , 610 , 555 , 635 };
+	std::vector<int> yLink = { 28 , 50 , 50 , 49 , 49 , 50 , 50 , 49 , 49 };
+	std::vector<int> xLinkWidth = { 70 , 20 , 20 , 43 , 43 , 20 , 20 , 43 , 43 };
+	std::vector<int> yLinkHeight = { 20 , 20 , 20 , 25 , 25 , 20 , 20 , 25 , 25 };
+	int nFigureShift = 0;
+
 	if (m_strFigure == L"Link")
 	{
-		GetDlgItem(IDC_STATIC_VERTICLES)->MoveWindow(350, 28, 70, 20);
-		GetDlgItem(IDC_STATIC_X1)->MoveWindow(360, 50, 20, 20);
-		GetDlgItem(IDC_STATIC_Y1)->MoveWindow(440, 50, 20, 20);
-		GetDlgItem(IDC_VERTICES_X1)->MoveWindow(385, 49, 43, 25);
-		GetDlgItem(IDC_VERTICES_Y1)->MoveWindow(465, 49, 43, 25);
-
-		GetDlgItem(IDC_STATIC_X2)->MoveWindow(530, 50, 20, 20);
-		GetDlgItem(IDC_STATIC_Y2)->MoveWindow(610, 50, 20, 20);
-		GetDlgItem(IDC_VERTICES_X2)->MoveWindow(555, 49, 43, 25);
-		GetDlgItem(IDC_VERTICES_Y2)->MoveWindow(635, 49, 43, 25);
-
 		nStateLink = SW_SHOW;
 		nStateFigure = SW_HIDE;
+		nFigureShift = 0;
 	}
 	else
 	{
-		GetDlgItem(IDC_STATIC_VERTICLES)->MoveWindow(350, 78, 70, 20);
-		GetDlgItem(IDC_STATIC_X1)->MoveWindow(360, 100, 20, 20);
-		GetDlgItem(IDC_STATIC_Y1)->MoveWindow(440, 100, 20, 20);
-		GetDlgItem(IDC_VERTICES_X1)->MoveWindow(385, 99, 43, 25);
-		GetDlgItem(IDC_VERTICES_Y1)->MoveWindow(465, 99, 43, 25);
-
-		GetDlgItem(IDC_STATIC_X2)->MoveWindow(530, 100, 20, 20);
-		GetDlgItem(IDC_STATIC_Y2)->MoveWindow(610, 100, 20, 20);
-		GetDlgItem(IDC_VERTICES_X2)->MoveWindow(555, 99, 43, 25);
-		GetDlgItem(IDC_VERTICES_Y2)->MoveWindow(635, 99, 43, 25);
-
 		nStateLink = SW_HIDE;
 		nStateFigure = SW_SHOW;
+		nFigureShift = 50;
+	}
+
+	for (int i = 0; i < NUMBER_LINK_CONTROLS; i++)
+	{
+		GetDlgItem(LinkIDC[i])->MoveWindow(xLink[i], yLink[i] + nFigureShift, xLinkWidth[i], yLinkHeight[i]);
 	}
 
 	for (int i = 0; i < FigureElements.size(); i++)

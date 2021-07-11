@@ -1,5 +1,8 @@
 #pragma once
 #include "Figure.h"
+
+#define ELLIPSE_DRAW_VERTICES 7
+
 class CEllipse : public CFigure
 {
 public:
@@ -26,9 +29,9 @@ protected:
 	bool bNormalised;
 
 public:
-	CPoint m_vCoordinates[4];
-	CPoint m_vAngleReturnCoordinates[4];
-	CPoint m_vDrawCoordinates[7];
-	CPoint m_vAngleCoordinates[7];
+	CPoint m_vCoordinates[VERTICES];
+	CPoint m_vAngleReturnCoordinates[VERTICES];
+	CPoint m_vDrawCoordinates[ELLIPSE_DRAW_VERTICES];
+	CPoint m_vAngleCoordinates[ELLIPSE_DRAW_VERTICES];
 };
 
